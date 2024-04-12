@@ -232,7 +232,12 @@ class Sprite {
     this.colr = color(red(this.colr),green(this.colr),blue(this.colr),alph);
   }
   undim() {
-    this.colr = color(red(this.colr),green(this.colr),blue(this.colr),255);
+    try {
+      this.colr = color(red(this.colr),green(this.colr),blue(this.colr),255);
+    }
+    catch{
+      console.error(`failed to undim ${this}`)
+    }
   }
 }
 function genWalls() {
@@ -464,10 +469,10 @@ function setup() {
   robots.push(new Robot(-1,-1,'blue'));
   robots.push(new Robot(-1,-1,'green'));
   robots.push(new Robot(-1,-1,'yellow'));
-  placeBots();
   genWalls();
   currentRobot = robots[1];
   genSprites();
+  placeBots();
 }
 function draw() {
   clear();

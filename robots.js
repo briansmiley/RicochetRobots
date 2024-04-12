@@ -232,12 +232,7 @@ class Sprite {
     this.colr = color(red(this.colr),green(this.colr),blue(this.colr),alph);
   }
   undim() {
-    try {
       this.colr = color(red(this.colr),green(this.colr),blue(this.colr),255);
-    }
-    catch{
-      console.error(`failed to undim ${this}`)
-    }
   }
 }
 function genWalls() {
@@ -389,10 +384,10 @@ function genSprites() {
     new Sprite(9,13,squareSize,drawCircle,'green'),
     new Sprite(13,11,squareSize,drawStar,'blue'),
     new Sprite(14,14,squareSize,drawTriangle,'red'),
-    new Sprite(7,7,squareSize,drawBlock,200),
-    new Sprite(7,8,squareSize,drawBlock,200),
-    new Sprite(8,7,squareSize,drawBlock,200),
-    new Sprite(8,8,squareSize,drawBlock,200)
+    new Sprite(7,7,squareSize,drawBlock,[200,200,200]),
+    new Sprite(7,8,squareSize,drawBlock,[200,200,200]),
+    new Sprite(8,7,squareSize,drawBlock,[200,200,200]),
+    new Sprite(8,8,squareSize,drawBlock,[200,200,200])
   ]
   for (let i = 0; i < sprites.length;i++){
     board.addSprite(sprites[i]);

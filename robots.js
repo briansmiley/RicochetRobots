@@ -346,9 +346,9 @@ function drawBlock(size,color) {
   noStroke();
   rect(0,0,size,size);
 }
-function drawBurst(size,_) {
+function drawBurst(size,colr) {
   translate(size/2,size/2);
-  let alph = 170
+  let alph = .66*alpha(colr);
   let colors = [
     color(255,0,0,alph),
     color(79,0,153,alph),

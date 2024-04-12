@@ -135,9 +135,18 @@ class Board {
     }
     //Draw sprites
     for (let i = 0; i < this.sprites.length; i++) {
+      let currentSprite = this.sprites[i];
+
       push();
-      translate(this.sprites[i].x * this.squareSize, this.sprites[i].y * this.squareSize);
-      this.sprites[i].render();
+      translate(currentSprite.x * this.squareSize, currentSprite.y * this.squareSize);
+      //Dim sprite if a robot is on top of it
+      for (let j = 0; j < robots.length; j++) {
+        if (currentSprite.x == robots[j].x && currentSprite.y == robots[j].y) {
+          currentSprite.dim(75);
+        }
+      }
+      currentSprite.render();
+      currentSprite.undim();
       pop();
     }
     //Draw Robots
@@ -214,11 +223,16 @@ class Sprite {
     this.y = y;
     this.size = size;
     this.drawFunc = drawFunc;
-    this.color = color;
+    this.colr = color;
   }
   render() {
-    this.drawFunc(this.size,this.color);
-
+    this.drawFunc(this.size,this.colr);
+  }
+  dim(alph) {
+    this.colr = color(red(this.colr),green(this.colr),blue(this.colr),alph);
+  }
+  undim() {
+    this.colr = color(red(this.colr),green(this.colr),blue(this.colr),255);
   }
 }
 function genWalls() {
@@ -414,7 +428,10 @@ function placeBots(){
     let tries = 0;
     while (true) {
       let collision = false;
-      if (tries > 1000) break;
+      if (tries > 1000) {
+        console.log('Bot placement error');
+        break;
+      }
       spotX = int(random(0,16));
       spotY = int(random(0,16));
       for (let j = 0; j < board.sprites.length; j++) {

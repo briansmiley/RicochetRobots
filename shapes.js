@@ -1,6 +1,6 @@
 class Shape {
-    constructor(color) {
-
+    constructor(color = null) {
+        this.color = color
     }
     draw(size){}
     drawSmall() {
@@ -76,9 +76,6 @@ class Block extends Shape {
 }
 
 class Burst extends Shape {
-    constructor(color) {
-        super(color);
-    }
 
     draw = pushWrap((size) => {
         let alph = .66*alpha(this.color);

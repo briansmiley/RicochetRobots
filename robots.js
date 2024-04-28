@@ -1,16 +1,22 @@
-var board;
-var boardSize = 16;
-var squareSize;
-var padding = 5;
-var robots = [];
-var currentRobot;
-var click;
-var thunk;
-var inMotion = false;
+let board;
+let boardSize = 16;
+let squareSize;
+const padding = 5;
+let robots = [];
+let sprites = [];
+let currentRobot;
+let tokens, currentToken;
+let click;
+let thunk;
+let inMotion = false;
+
+
 class Robot {
   constructor(x,y,color){
     this.x = x;
     this.y = y;
+    this.lastX = x;
+    this.lastY = y;
     this.color = color;
     this.vel = [0,0];
     this.selected = false;
@@ -118,12 +124,13 @@ class Board {
   }
   show() {
     //Draw the grid
+    push()
+    fill(255)
     for (let i = 0; i < this.h; i ++) {
       for (let j = 0; j < this.w; j++) {
         rect(this.origX + (j * this.squareSize), this.origY + (i * this.squareSize), this.squareSize);
       }
     }
-    push();
     fill(220);
     rect(this.origX + (currentRobot.x * this.squareSize), this.origY + (currentRobot.y * this.squareSize), this.squareSize);
     pop();
@@ -363,7 +370,6 @@ function drawBurst(size,colr) {
     ellipse(0,0,size-(2*padding),size/4);
     rotate(PI/6);
   }
-
 }
 function genSprites() {
   var sprites = [
@@ -452,6 +458,14 @@ function placeBots(){
       }
     }
   }
+}
+
+function saveState() {
+  robots.forEach((robot) => {
+    robot.lastX = robot.x;
+    robot.lastY = robot.y;
+  })
+  //Save tokens? Save uhhhh nah thats it maybe
 }
 function setup() {
   createCanvas(700, 700);

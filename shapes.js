@@ -1,40 +1,51 @@
 class Shape {
-    constructor(color = null) {
+    constructor(x, y, color = null) {
         this.color = color
+        this.x = x;
+        this.y = y;
     }
     draw(size){}
     drawSmall() {
-        draw(.7 * squareSize)
+        this.draw(.7 * squareSize)
     }
     drawMed() {
-        draw(squareSize)
+        this.draw(.8*squareSize)
     }
     drawLarge() {
-        draw(4 * squareSize)
+        this.draw(4 * squareSize)
+    }
+    renderBoard() {
+        this.drawMed();
+    }
+    dim(alph) {
+        this.color = color(red(this.color),green(this.color),blue(this.color),alph);
+    }
+    undim() {
+        this.dim(255);
     }
 }
 
 class Triangle extends Shape {
-    constructor(color){
-        super(color)
+    constructor(x, y, color){
+        super(x, y, color)
     }
     draw = pushWrap( (size) => {
         fill(this.color);
-        triangle(0, size/2, -size/2, size/2, size/2, size/2);
+        triangle(0, -size/2, -size/2, size/2, size/2, size/2);
     })
 }
 class Square extends Shape {
-    constructor(color){
-        super(color)
+    constructor(x, y, color){
+        super(x, y, color)
     }
     draw = pushWrap( (size) => {
         fill(this.color);
-        rect(-size/2, -size/2, size/2, size/2);
+        rect(-size/2, -size/2, size, size);
     })
 }
 class Circle extends Shape {
-    constructor(color){
-        super(color)
+    constructor(x, y, color){
+        super(x, y, color)
     }
     draw = pushWrap((size) => {
         fill(this.color);
@@ -43,8 +54,8 @@ class Circle extends Shape {
 }
 
 class Star extends Shape {
-    constructor(color) {
-        super(color)
+    constructor(x, y, color){
+        super(x, y, color)
     }
     draw = pushWrap((size) => {
         fill(this.color);
@@ -65,8 +76,8 @@ class Star extends Shape {
 }
 
 class Block extends Shape {
-    constructor(color) {
-        super(color);
+    constructor(x, y, color){
+        super(x, y, color)
     }
     draw = pushWrap((size) => {
         fill(this.color);
@@ -76,7 +87,9 @@ class Block extends Shape {
 }
 
 class Burst extends Shape {
-
+    constructor(x, y, color){
+        super(x, y, color)
+    }
     draw = pushWrap((size) => {
         let alph = .66*alpha(this.color);
         let colors = [
@@ -87,11 +100,11 @@ class Burst extends Shape {
         color(245,126,0,alph),
         color(0,0,0,100),
         ]
-        for (let i = 0;i < 6; i++) {
+        colors.forEach( (color) => {
     
-            fill(colors[i]);
-            ellipse(0,0,size-(2*padding),size/4);
+            fill(color);
+            ellipse(0,0,size,size/4);
             rotate(PI/6);
-        }
+        })
     })
 }

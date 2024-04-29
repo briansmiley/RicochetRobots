@@ -1,15 +1,15 @@
+const boardSize = 16;
+let squareSize, wallThickness;
 let board;
-let boardSize = 16;
-let squareSize;
-const padding = 5;
+let padding = 5;
 let robots = [];
-let sprites = [];
+let spriteData, sprites;
 let currentRobot;
-let tokens, currentToken;
 let click;
 let thunk;
 let inMotion = false;
-
+let noMove = false;
+let currentToken, tokens;
 
 class Robot {
   constructor(x,y,color){
@@ -25,14 +25,13 @@ class Robot {
     this.x = x;
     this.y = y;
   }
-  show(size) {
+  render = pushWrap( (size) => {
     fill(this.color);
     
-    circle(size/2,size/4,size/6);
-    circle(size/2,size/2.2,size/4);
-    circle(size/2,size/1.35,size/3);
-    
-  }
+    circle(0,-size/4,size/6);
+    circle(0,-size/20,size/4);
+    circle(0,size/4,size/3);
+  })
   stop() {
     this.vel=[0,0];
     if(inMotion) click.play();
@@ -102,7 +101,7 @@ class Board {
     this.origY = 0;
     this.w = w;
     this.h = h;
-    this.sprites = [];
+    this.wallThickness = wallThickness;
     this.squareSize = squareSize;
     this.spaces = new Array(h);
     for (let i = 0; i < h; i++) {
@@ -116,81 +115,86 @@ class Board {
     this.origX = x;
     this.origY = y;
   }
-  addSprite(sprite){
-    this.sprites.push(sprite)
-  }
   update(){
     currentRobot.move();
   }
-  show() {
-    //Draw the grid
-    push()
-    fill(255)
+  
+  show = pushWrap( () => {
+      translate(this.origX, this.origY);
+      this.renderGrid();
+      this.renderWalls();
+      this.renderCurrentToken();
+      this.renderSprites();
+      this.renderBots();;
+  })
+  renderGrid = pushWrap( () => {
+    //Draw the boxes
     for (let i = 0; i < this.h; i ++) {
       for (let j = 0; j < this.w; j++) {
-        rect(this.origX + (j * this.squareSize), this.origY + (i * this.squareSize), this.squareSize);
+        rect((j * this.squareSize), (i * this.squareSize), this.squareSize);
       }
     }
-    fill(220);
-    rect(this.origX + (currentRobot.x * this.squareSize), this.origY + (currentRobot.y * this.squareSize), this.squareSize);
+    rectMode(CENTER);
+    //Draw center gray square
+    push();
+      fill(200);
+      translate(this.squareSize * this.w/2, this.squareSize * this.h/2)
+      rect(0, 0, squareSize * 2);
     pop();
-    //Draw the barrier walls
-    for (let i = 0; i < this.h; i ++) {
-      for (let j = 0; j < this.w; j++) {
-        this.spaces[i][j].renderWalls(this.squareSize);
-      }
-    }
-    //Draw sprites
-    for (let i = 0; i < this.sprites.length; i++) {
-      let currentSprite = this.sprites[i];
-
-      push();
-      translate(currentSprite.x * this.squareSize, currentSprite.y * this.squareSize);
-      //Dim sprite if a robot is on top of it
-      for (let j = 0; j < robots.length; j++) {
-        if (currentSprite.x == robots[j].x && currentSprite.y == robots[j].y) {
-          currentSprite.dim(75);
+    //Highlight current robot
+    push();
+      fill(220);
+      translate(this.squareSize * (.5 + currentRobot.x),this.squareSize * (.5 + currentRobot.y))
+      rect(0, 0, this.squareSize);
+    pop();
+  })
+  renderWalls() {
+    this.spaces.forEach( (row) =>
+      row.forEach( (space) => space.renderWalls(this.squareSize, this.wallThickness))
+    );
+  }
+  renderSprites() {
+    sprites.forEach(
+      pushWrap(
+        (currentSprite) => {
+          translate(this.squareSize * (.5 + currentSprite.x), this.squareSize * (.5 + currentSprite.y));
+          //Dim sprite if a robot is on top of it
+          robots.forEach((robot) => {
+            if (currentSprite.x == robot.x && currentSprite.y == robot.y) currentSprite.dim(75);
+          });
+          currentSprite.renderBoard();
+          currentSprite.undim();
         }
-      }
-      currentSprite.render();
-      currentSprite.undim();
-      pop();
-    }
-    //Draw Robots
-    for (let i = 0; i < robots.length; i++) {
-      push();
-      translate(robots[i].x*squareSize,robots[i].y*squareSize);
-      robots[i].show(squareSize);
-      pop();
-    }
-    //Draw Center thing
-    // push();
-    // fill(200);
-    // rectMode(CENTER);
-    // rect(width/2,height/2,squareSize*2);
-    // pop();
+      )
+    )
+  }
+  renderCurrentToken = pushWrap( () => {
+    translate(squareSize * this.w/2, squareSize * this.h/2);
+    currentToken.drawLarge();
+  })
+  renderBots() {
+    robots.forEach(
+      pushWrap(
+        (robot) => {
+          translate(this.squareSize * (.5 + robot.x),this.squareSize * (.5 + robot.y));
+          robot.render(squareSize);
+        }
+      )
+    )
   }
 }
 class Space {
   constructor(x,y) {
     this.x = x;
     this.y = y;
-    this.sprites = [];
     this.northWall = false;
     this.eastWall = false;
     this.southWall = false;
     this.westWall = false;
   }
-  render(x,y,size) {
-
-    for (let i = 0; i < this.sprites.length; i++) {
-      this.sprites[i].render(this.x,this.y);
-    } 
-  }
-  renderWalls(size){
-    push();
+  renderWalls = pushWrap((size, wallThickness) => {
     translate(this.x * size, this.y * size);
-    strokeWeight(5);
+    strokeWeight(wallThickness);
     stroke(0);
     if (this.northWall) {
       line(0,0,size,0);
@@ -204,8 +208,7 @@ class Space {
     if (this.westWall) {
       line(0,0,0,size);
     }
-    pop() 
-  }
+  })
   addWall(dir) {
     switch (dir) {
       case 'n':
@@ -319,84 +322,50 @@ function genWalls() {
   board.spaces[15][11].addWall('e');
   
 }
-function drawTriangle(size,color){
-  fill(color);
-  triangle(size/2,padding,padding,size-padding,size-padding,size-padding);
-}
-function drawSquare(size,color){
-  fill(color);
-  rect(padding,padding,size-(2*padding),size-(2*padding))
-}
-function drawCircle(size,color) {
-  fill(color);
-  circle(size/2,size/2,size-1.5*padding)
-}
-function drawStar(size, color) {
-  translate(size/2,size/2);
-  fill(color);
-  rotate(-PI/2);
-  beginShape();
-  let x,y;
-  let increment = TWO_PI/5;
-  for (let a = 0; a <= TWO_PI; a += increment) {
-    x = cos(a) * (.6*size-padding);
-    y = sin(a) * (.6*size-padding);
-    vertex(x,y);
-    x = cos(a + increment/2) * .22*(size-padding);
-    y = sin(a + increment/2) * .22*(size-padding);
-    vertex(x,y);
-  }
-  endShape();
-}
-function drawBlock(size,color) {
-  fill(color);
-  noStroke();
-  rect(0,0,size,size);
-}
-function drawBurst(size,colr) {
-  translate(size/2,size/2);
-  let alph = .66*alpha(colr);
-  let colors = [
-    color(255,0,0,alph),
-    color(79,0,153,alph),
-    color(0,119,255,alph),
-    color(0,153,192,alph),
-    color(245,126,0,alph),
-    color(0,0,0,100),
-    ]
-  for (let i = 0;i < 6; i++) {
 
-    fill(colors[i]);
-    ellipse(0,0,size-(2*padding),size/4);
-    rotate(PI/6);
-  }
+function genSprites(spriteData) {
+
+  const makeShape = ({x, y, color, ShapeClass}) => new ShapeClass(x, y, color);
+  return spriteData.map((sprite) => makeShape(sprite))
+
+  //Old sprite hardcoding; maintaining in case I copied anything wrong
+
+  // var sprites = [
+  //   new Sprite(1,2,squareSize,drawTriangle,'green'),
+  //   new Sprite(6,1,squareSize,drawSquare,'yellow'),
+  //   new Sprite(6,5,squareSize,drawSquare,'blue'),
+  //   new Sprite(3,6,squareSize,drawCircle,'red'),
+  //   new Sprite(7,12,squareSize,drawBurst,'red'),
+  //   new Sprite(9,1,squareSize,drawSquare,'green'),
+  //   new Sprite(4,9,squareSize,drawTriangle,'yellow'),
+  //   new Sprite(6,10,squareSize,drawCircle,'blue'),
+  //   new Sprite(8,10,squareSize,drawCircle,'yellow'),
+  //   new Sprite(10,4,squareSize,drawSquare,'red'),
+  //   new Sprite(14,2,squareSize,drawStar,'yellow'),
+  //   new Sprite(12,6,squareSize,drawTriangle,'blue'),
+  //   new Sprite(3,14,squareSize,drawStar,'green'),
+  //   new Sprite(1,13,squareSize,drawStar,'red'),
+  //   new Sprite(9,13,squareSize,drawCircle,'green'),
+  //   new Sprite(13,11,squareSize,drawStar,'blue'),
+  //   new Sprite(14,14,squareSize,drawTriangle,'red'),
+  //   new Sprite(7,7,squareSize,drawBlock,[200,200,200]),
+  //   new Sprite(7,8,squareSize,drawBlock,[200,200,200]),
+  //   new Sprite(8,7,squareSize,drawBlock,[200,200,200]),
+  //   new Sprite(8,8,squareSize,drawBlock,[200,200,200])
+  // ]
+  // for (let i = 0; i < sprites.length;i++){
+  //   board.addSprite(sprites[i]);
+  // }
 }
-function genSprites() {
-  var sprites = [
-    new Sprite(1,2,squareSize,drawTriangle,'green'),
-    new Sprite(6,1,squareSize,drawSquare,'yellow'),
-    new Sprite(6,5,squareSize,drawSquare,'blue'),
-    new Sprite(3,6,squareSize,drawCircle,'red'),
-    new Sprite(7,12,squareSize,drawBurst,'red'),
-    new Sprite(9,1,squareSize,drawSquare,'green'),
-    new Sprite(4,9,squareSize,drawTriangle,'yellow'),
-    new Sprite(6,10,squareSize,drawCircle,'blue'),
-    new Sprite(8,10,squareSize,drawCircle,'yellow'),
-    new Sprite(10,4,squareSize,drawSquare,'red'),
-    new Sprite(14,2,squareSize,drawStar,'yellow'),
-    new Sprite(12,6,squareSize,drawTriangle,'blue'),
-    new Sprite(3,14,squareSize,drawStar,'green'),
-    new Sprite(1,13,squareSize,drawStar,'red'),
-    new Sprite(9,13,squareSize,drawCircle,'green'),
-    new Sprite(13,11,squareSize,drawStar,'blue'),
-    new Sprite(14,14,squareSize,drawTriangle,'red'),
-    new Sprite(7,7,squareSize,drawBlock,[200,200,200]),
-    new Sprite(7,8,squareSize,drawBlock,[200,200,200]),
-    new Sprite(8,7,squareSize,drawBlock,[200,200,200]),
-    new Sprite(8,8,squareSize,drawBlock,[200,200,200])
-  ]
-  for (let i = 0; i < sprites.length;i++){
-    board.addSprite(sprites[i]);
+
+class Token {
+  constructor(sprite) {
+    this.sprite = sprite;
+    this.collected = false;
+  }
+
+  draw() {
+    this.sprite.drawLarge();
   }
 }
 function mousePressed(){
@@ -410,7 +379,7 @@ function mousePressed(){
   }
 }
 function keyPressed(){
-  if (inMotion) return;
+  if (inMotion || noMove) return;
   switch (keyCode) {
     case UP_ARROW:
       currentRobot.vel = [0,-1];
@@ -429,50 +398,73 @@ function keyPressed(){
   
 }
 function placeBots(){
-  for (let i = 0; i < robots.length; i++) {
+  robots.forEach( (robot) => {
     let spotX,spotY;
     let tries = 0;
     while (true) {
       let collision = false;
       if (tries > 1000) {
-        console.log('Bot placement error');
-        break;
+        throw new Error('Bot placement error');
       }
       spotX = int(random(0,16));
       spotY = int(random(0,16));
-      for (let j = 0; j < board.sprites.length; j++) {
-        if (board.sprites[j].x == spotX && board.sprites[j].y == spotY) {
-          collision = true;
-          break;
-        }
-      }
-      for (let j = 0; j < robots.length; j++) {
-        if (robots[j].x == spotX && robots[j].y == spotY) {
-          collision = true;
-          break;
-        }
-      }
+      centerSquares = [
+        [7,7],
+        [7,8],
+        [8,7],
+        [8,8]
+      ];
+      collision = (sprites.some( (sprite) => (sprite.x == spotX && sprite.y == spotY)) ||
+          robots.some( (robo) => (robo.x == spotX && robo.y == spotY))) ||
+          centerSquares.some ( (coords) => coords[0] == spotX && coords[1] == spotY) 
       if (!collision) {
-        robots[i].place(spotX,spotY);
+        robot.place(spotX,spotY);
         break;
       }
     }
+  });
+}
+
+//Hard coded but later might populate this using modular board configs
+spriteData = [
+  {x: 1, y: 2, ShapeClass: Triangle, color: 'green'},
+  {x: 6, y: 1, ShapeClass: Square, color: 'yellow'},
+  {x: 6, y: 5, ShapeClass: Square, color: 'blue'},
+  {x: 3, y: 6, ShapeClass: Circle, color: 'red'},
+  {x: 7, y: 12, ShapeClass: Burst, color: 'gray'},
+  {x: 9, y: 1, ShapeClass: Square, color: 'green'},
+  {x: 4, y: 9, ShapeClass: Triangle, color: 'yellow'},
+  {x: 6, y: 10, ShapeClass: Circle, color: 'blue'},
+  {x: 8, y: 10, ShapeClass: Circle, color: 'yellow'},
+  {x: 10, y: 4, ShapeClass: Square, color: 'red'},
+  {x: 14, y: 2, ShapeClass: Star, color: 'yellow'},
+  {x: 12, y: 6, ShapeClass: Triangle, color: 'blue'},
+  {x: 3, y: 14, ShapeClass: Star, color: 'green'},
+  {x: 1, y: 13, ShapeClass: Star, color: 'red'},
+  {x: 9, y: 13, ShapeClass: Circle, color: 'green'},
+  {x: 13, y: 11, ShapeClass: Star, color: 'blue'},
+  {x: 14, y: 14, ShapeClass: Triangle, color: 'red'},
+]
+
+//returns an uncollected sprite or returns false if there are none
+function getNextToken() {
+  if (sprites.every( (sprite) => sprite.collected)) return false;
+  while(true) {
+    let s = sprites[int(random(sprites.length))];
+    if (!s.collected) return s;
   }
 }
 
-function saveState() {
-  robots.forEach((robot) => {
-    robot.lastX = robot.x;
-    robot.lastY = robot.y;
-  })
-  //Save tokens? Save uhhhh nah thats it maybe
+
+function preload() {
+  click = loadSound('click.mp3');
 }
 function setup() {
   createCanvas(700, 700);
-  click = loadSound('click.mp3');
   background(255);
   frameRate(45);
   squareSize = width/16;
+  wallThickness = squareSize / 9;
   board = new Board(boardSize,boardSize,squareSize);
   robots.push(new Robot(-1,-1,'red'));
   robots.push(new Robot(-1,-1,'blue'));
@@ -480,8 +472,9 @@ function setup() {
   robots.push(new Robot(-1,-1,'yellow'));
   genWalls();
   currentRobot = robots[1];
-  genSprites();
+  sprites = genSprites(spriteData);
   placeBots();
+  currentToken = getNextToken();
 }
 function draw() {
   clear();
@@ -491,4 +484,15 @@ function draw() {
   board.update();
   board.show();
   
+}
+
+
+
+function pushWrap(fn) {
+  return (...args) => {
+    push();
+    const res = fn(...args);
+    pop();
+    return res;
+  }
 }

@@ -1,5 +1,5 @@
 const boardSize = 16;
-let squareSize;
+let squareSize, wallThickness;
 let board;
 let padding = 5;
 let robots = [];
@@ -98,6 +98,7 @@ class Board {
     this.origY = 0;
     this.w = w;
     this.h = h;
+    this.wallThickness = wallThickness;
     this.squareSize = squareSize;
     this.spaces = new Array(h);
     for (let i = 0; i < h; i++) {
@@ -114,6 +115,14 @@ class Board {
   update(){
     currentRobot.move();
   }
+  
+  show = pushWrap( () => {
+      translate(this.origX, this.origY);
+      this.renderGrid();
+      this.renderWalls();
+      this.renderSprites();
+      this.renderBots();
+  })
   renderGrid = pushWrap( () => {
     //Draw the boxes
     for (let i = 0; i < this.h; i ++) {
@@ -137,16 +146,9 @@ class Board {
   })
   renderWalls() {
     this.spaces.forEach( (row) =>
-      row.forEach( (space) => space.renderWalls(this.squareSize))
+      row.forEach( (space) => space.renderWalls(this.squareSize, this.wallThickness))
     );
   }
-  show = pushWrap( () => {
-      translate(this.origX, this.origY);
-      this.renderGrid();
-      this.renderWalls();
-      this.renderSprites();
-      this.renderBots();
-  })
   renderSprites() {
     sprites.forEach(
       pushWrap(
@@ -177,22 +179,14 @@ class Space {
   constructor(x,y) {
     this.x = x;
     this.y = y;
-    this.sprites = [];
     this.northWall = false;
     this.eastWall = false;
     this.southWall = false;
     this.westWall = false;
   }
-  render(x,y,size) {
-
-    for (let i = 0; i < this.sprites.length; i++) {
-      this.sprites[i].render(this.x,this.y);
-    } 
-  }
-  renderWalls(size){
-    push();
+  renderWalls = pushWrap((size, wallThickness) => {
     translate(this.x * size, this.y * size);
-    strokeWeight(5);
+    strokeWeight(wallThickness);
     stroke(0);
     if (this.northWall) {
       line(0,0,size,0);
@@ -206,8 +200,7 @@ class Space {
     if (this.westWall) {
       line(0,0,0,size);
     }
-    pop() 
-  }
+  })
   addWall(dir) {
     switch (dir) {
       case 'n':
@@ -350,6 +343,9 @@ function genSprites(spriteData) {
 
   const makeShape = ({x, y, color, ShapeClass}) => new ShapeClass(x, y, color);
   return spriteData.map((sprite) => makeShape(sprite))
+
+  //Old sprite hardcoding; maintaining in case I copied anything wrong
+  
   // var sprites = [
   //   new Sprite(1,2,squareSize,drawTriangle,'green'),
   //   new Sprite(6,1,squareSize,drawSquare,'yellow'),
@@ -441,6 +437,7 @@ function setup() {
   background(255);
   frameRate(45);
   squareSize = width/16;
+  wallThickness = squareSize / 9;
   board = new Board(boardSize,boardSize,squareSize);
   robots.push(new Robot(-1,-1,'red'));
   robots.push(new Robot(-1,-1,'blue'));

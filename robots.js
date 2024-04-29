@@ -139,27 +139,35 @@ class Board {
         }
       }
       //Draw sprites
-      sprites.forEach( (currentSprite) => {
-        push();
+      this.renderSprites();
+      //Draw Robots
+      this.renderBots();
+    pop();
+  }
+  renderSprites() {
+    sprites.forEach(
+      pushWrap(
+        (currentSprite) => {
           translate(this.squareSize * (.5 + currentSprite.x), this.squareSize * (.5 + currentSprite.y));
           //Dim sprite if a robot is on top of it
           robots.forEach((robot) => {
-            if (currentSprite.x == robot.x && currentSprite.y == robot.y) {
-              currentSprite.dim(75);
-            }
+            if (currentSprite.x == robot.x && currentSprite.y == robot.y) currentSprite.dim(75);
           });
           currentSprite.renderBoard();
           currentSprite.undim();
-        pop();
-      });
-      //Draw Robots
-      robots.forEach((robot) => {
-        push();
+        }
+      )
+    )
+  }
+  renderBots() {
+    robots.forEach(
+      pushWrap(
+        (robot) => {
           translate(this.squareSize * (.5 + robot.x),this.squareSize * (.5 + robot.y));
           robot.render(squareSize);
-        pop();
-      })
-    pop();
+        }
+      )
+    )
   }
 }
 class Space {
@@ -316,7 +324,7 @@ spriteData = [
   {x: 6, y: 1, ShapeClass: Square, color: 'yellow'},
   {x: 6, y: 5, ShapeClass: Square, color: 'blue'},
   {x: 3, y: 6, ShapeClass: Circle, color: 'red'},
-  {x: 7, y: 12, ShapeClass: Burst, color: 255},
+  {x: 7, y: 12, ShapeClass: Burst, color: 'gray'},
   {x: 9, y: 1, ShapeClass: Square, color: 'green'},
   {x: 4, y: 9, ShapeClass: Triangle, color: 'yellow'},
   {x: 6, y: 10, ShapeClass: Circle, color: 'blue'},

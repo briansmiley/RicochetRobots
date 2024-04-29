@@ -114,36 +114,39 @@ class Board {
   update(){
     currentRobot.move();
   }
-  show() {
+  renderGrid = pushWrap( () => {
+    //Draw the boxes
+    for (let i = 0; i < this.h; i ++) {
+      for (let j = 0; j < this.w; j++) {
+        rect((j * this.squareSize), (i * this.squareSize), this.squareSize);
+      }
+    }
+    rectMode(CENTER);
+    //Draw center gray square
     push();
-      translate(this.origX, this.origY);
-      //Draw the grid
-      for (let i = 0; i < this.h; i ++) {
-        for (let j = 0; j < this.w; j++) {
-          rect((j * this.squareSize), (i * this.squareSize), this.squareSize);
-        }
-      }
-      push();
-        fill(200);
-        rectMode(CENTER);
-        rect(squareSize * this.w/2, squareSize * this.h/2, squareSize * 2);
-      pop()
-      push();
-        fill(220);
-        rect((currentRobot.x * this.squareSize), (currentRobot.y * this.squareSize), this.squareSize);
-      pop();
-      //Draw the barrier walls
-      for (let i = 0; i < this.h; i ++) {
-        for (let j = 0; j < this.w; j++) {
-          this.spaces[i][j].renderWalls(this.squareSize);
-        }
-      }
-      //Draw sprites
-      this.renderSprites();
-      //Draw Robots
-      this.renderBots();
+      fill(200);
+      translate(this.squareSize * this.w/2, this.squareSize * this.h/2)
+      rect(0, 0, squareSize * 2);
     pop();
+    //Highlight current robot
+    push();
+      fill(220);
+      translate(this.squareSize * (.5 + currentRobot.x),this.squareSize * (.5 + currentRobot.y))
+      rect(0, 0, this.squareSize);
+    pop();
+  })
+  renderWalls() {
+    this.spaces.forEach( (row) =>
+      row.forEach( (space) => space.renderWalls(this.squareSize))
+    );
   }
+  show = pushWrap( () => {
+      translate(this.origX, this.origY);
+      this.renderGrid();
+      this.renderWalls();
+      this.renderSprites();
+      this.renderBots();
+  })
   renderSprites() {
     sprites.forEach(
       pushWrap(
@@ -432,7 +435,6 @@ function placeBots(){
 }
 function preload() {
   click = loadSound('click.mp3');
-
 }
 function setup() {
   createCanvas(700, 700);

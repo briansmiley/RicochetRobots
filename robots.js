@@ -430,9 +430,12 @@ function placeBots(){
     }
   });
 }
+function preload() {
+  click = loadSound('click.mp3');
+
+}
 function setup() {
   createCanvas(700, 700);
-  click = loadSound('click.mp3');
   background(255);
   frameRate(45);
   squareSize = width/16;

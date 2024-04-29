@@ -8,6 +8,9 @@ let currentRobot;
 let click;
 let thunk;
 let inMotion = false;
+let noMove = false;
+let currentToken, tokens;
+
 class Robot {
   constructor(x,y,color){
     this.x = x;
@@ -20,15 +23,13 @@ class Robot {
     this.x = x;
     this.y = y;
   }
-  render(size) {
-    push();
+  render = pushWrap( (size) => {
     fill(this.color);
     
     circle(0,-size/4,size/6);
     circle(0,-size/20,size/4);
     circle(0,size/4,size/3);
-    pop();
-  }
+  })
   stop() {
     this.vel=[0,0];
     if(inMotion) click.play();
@@ -120,8 +121,9 @@ class Board {
       translate(this.origX, this.origY);
       this.renderGrid();
       this.renderWalls();
+      this.renderCurrentToken();
       this.renderSprites();
-      this.renderBots();
+      this.renderBots();;
   })
   renderGrid = pushWrap( () => {
     //Draw the boxes
@@ -164,6 +166,10 @@ class Board {
       )
     )
   }
+  renderCurrentToken = pushWrap( () => {
+    translate(squareSize * this.w/2, squareSize * this.h/2);
+    currentToken.drawLarge();
+  })
   renderBots() {
     robots.forEach(
       pushWrap(
@@ -314,30 +320,6 @@ function genWalls() {
   board.spaces[15][11].addWall('e');
   
 }
-//Hard coded but later might populate this using modular board configs
-spriteData = [
-  {x: 1, y: 2, ShapeClass: Triangle, color: 'green'},
-  {x: 6, y: 1, ShapeClass: Square, color: 'yellow'},
-  {x: 6, y: 5, ShapeClass: Square, color: 'blue'},
-  {x: 3, y: 6, ShapeClass: Circle, color: 'red'},
-  {x: 7, y: 12, ShapeClass: Burst, color: 'gray'},
-  {x: 9, y: 1, ShapeClass: Square, color: 'green'},
-  {x: 4, y: 9, ShapeClass: Triangle, color: 'yellow'},
-  {x: 6, y: 10, ShapeClass: Circle, color: 'blue'},
-  {x: 8, y: 10, ShapeClass: Circle, color: 'yellow'},
-  {x: 10, y: 4, ShapeClass: Square, color: 'red'},
-  {x: 14, y: 2, ShapeClass: Star, color: 'yellow'},
-  {x: 12, y: 6, ShapeClass: Triangle, color: 'blue'},
-  {x: 3, y: 14, ShapeClass: Star, color: 'green'},
-  {x: 1, y: 13, ShapeClass: Star, color: 'red'},
-  {x: 9, y: 13, ShapeClass: Circle, color: 'green'},
-  {x: 13, y: 11, ShapeClass: Star, color: 'blue'},
-  {x: 14, y: 14, ShapeClass: Triangle, color: 'red'},
-  // {x: 7, y: 7, ShapeClass: Block, color: 'green'},
-  // {x: 7, y: 8, ShapeClass: Block, color: 'green'},
-  // {x: 8, y: 7, ShapeClass: Block, color: 'green'},
-  // {x: 8, y: 8, ShapeClass: Block, color: 'green'}
-]
 
 function genSprites(spriteData) {
 
@@ -345,7 +327,7 @@ function genSprites(spriteData) {
   return spriteData.map((sprite) => makeShape(sprite))
 
   //Old sprite hardcoding; maintaining in case I copied anything wrong
-  
+
   // var sprites = [
   //   new Sprite(1,2,squareSize,drawTriangle,'green'),
   //   new Sprite(6,1,squareSize,drawSquare,'yellow'),
@@ -373,6 +355,17 @@ function genSprites(spriteData) {
   //   board.addSprite(sprites[i]);
   // }
 }
+
+class Token {
+  constructor(sprite) {
+    this.sprite = sprite;
+    this.collected = false;
+  }
+
+  draw() {
+    this.sprite.drawLarge();
+  }
+}
 function mousePressed(){
   let x = floor(mouseX / squareSize);
   let y = floor(mouseY / squareSize);
@@ -384,7 +377,7 @@ function mousePressed(){
   }
 }
 function keyPressed(){
-  if (inMotion) return;
+  if (inMotion || noMove) return;
   switch (keyCode) {
     case UP_ARROW:
       currentRobot.vel = [0,-1];
@@ -429,6 +422,38 @@ function placeBots(){
     }
   });
 }
+
+//Hard coded but later might populate this using modular board configs
+spriteData = [
+  {x: 1, y: 2, ShapeClass: Triangle, color: 'green'},
+  {x: 6, y: 1, ShapeClass: Square, color: 'yellow'},
+  {x: 6, y: 5, ShapeClass: Square, color: 'blue'},
+  {x: 3, y: 6, ShapeClass: Circle, color: 'red'},
+  {x: 7, y: 12, ShapeClass: Burst, color: 'gray'},
+  {x: 9, y: 1, ShapeClass: Square, color: 'green'},
+  {x: 4, y: 9, ShapeClass: Triangle, color: 'yellow'},
+  {x: 6, y: 10, ShapeClass: Circle, color: 'blue'},
+  {x: 8, y: 10, ShapeClass: Circle, color: 'yellow'},
+  {x: 10, y: 4, ShapeClass: Square, color: 'red'},
+  {x: 14, y: 2, ShapeClass: Star, color: 'yellow'},
+  {x: 12, y: 6, ShapeClass: Triangle, color: 'blue'},
+  {x: 3, y: 14, ShapeClass: Star, color: 'green'},
+  {x: 1, y: 13, ShapeClass: Star, color: 'red'},
+  {x: 9, y: 13, ShapeClass: Circle, color: 'green'},
+  {x: 13, y: 11, ShapeClass: Star, color: 'blue'},
+  {x: 14, y: 14, ShapeClass: Triangle, color: 'red'},
+]
+
+//returns an uncollected sprite or returns false if there are none
+function getNextToken() {
+  if (sprites.every( (sprite) => sprite.collected)) return false;
+  while(true) {
+    let s = sprites[int(random(sprites.length))];
+    if (!s.collected) return s;
+  }
+}
+
+
 function preload() {
   click = loadSound('click.mp3');
 }
@@ -447,6 +472,7 @@ function setup() {
   currentRobot = robots[1];
   sprites = genSprites(spriteData);
   placeBots();
+  currentToken = getNextToken();
 }
 function draw() {
   clear();

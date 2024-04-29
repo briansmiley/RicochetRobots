@@ -3,16 +3,20 @@ class Shape {
         this.color = color
         this.x = x;
         this.y = y;
+        this.collected = false;
     }
     draw(size){}
     drawSmall() {
-        this.draw(.7 * squareSize)
+        strokeWeight(3);
+        fill(200);
+        circle(0,0,.625 * squareSize);
+        this.draw(.5 * squareSize)
     }
     drawMed() {
         this.draw(.8*squareSize)
     }
     drawLarge() {
-        this.draw(4 * squareSize)
+        this.draw(1.5 * squareSize)
     }
     renderBoard() {
         this.drawMed();

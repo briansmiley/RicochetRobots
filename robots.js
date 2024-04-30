@@ -159,7 +159,6 @@ class Board {
   update(){
     currentRobot.move();
     if (this.checkGoal()) {
-      if (!hitTarget) console.log(`Bingo ${moveCounter.count}`)
       hitTarget = true;
       updateTurnBest(moveCounter.count + 1);
       noMove = true;

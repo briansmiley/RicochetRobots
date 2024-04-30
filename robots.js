@@ -3,14 +3,14 @@ let squareSize, wallThickness;
 let board;
 let padding = 5;
 let robots = [];
-let spriteData, sprites;
+let spriteData, sprites, placeKeepers;
 let currentRobot;
 let click;
 let thunk;
 let inMotion = false;
 let noMove = false;
 let currentToken, tokens;
-let moveCounter;
+let moveCounter, hitTarget, turnBest;
 
 class Counter {
   constructor(init = 0) {
@@ -33,12 +33,13 @@ class Counter {
   })
 }
 class Robot {
-  constructor(x,y,color){
+  constructor(x,y,colr){
     this.x = x;
     this.y = y;
     this.lastX = x;
     this.lastY = y;
-    this.color = color;
+    this.color = color(colr);
+    this.colorName = colr;
     this.vel = [0,0];
     this.selected = false;
   }
@@ -53,6 +54,12 @@ class Robot {
     circle(0,-size/20,size/4);
     circle(0,size/4,size/3);
   })
+  renderPlaceholder = pushWrap( () => {
+    fill(setAlpha(this.color, 100));
+    strokeWeight(3);
+    circle((this.lastX + .5) * squareSize, (this.lastY + .5) * squareSize, .9*squareSize);
+  })
+
   stop() {
     this.vel=[0,0];
     if(inMotion) {
@@ -62,6 +69,7 @@ class Robot {
     inMotion = false;
   }
   move(){
+    if (noMove)this.vel = [0,0]
     let currentSquare = board.spaces[this.y][this.x];
     let nextX = this.x + this.vel[0];
     let nextY = this.y + this.vel[1];
@@ -141,7 +149,13 @@ class Board {
   }
   update(){
     currentRobot.move();
-    this.checkGoal();
+    if (this.checkGoal()) {
+      if (!hitTarget) console.log(`Bingo ${moveCounter.count}`)
+      hitTarget = true;
+      updateTurnBest(moveCounter.count + 1);
+      noMove = true;
+    }
+    else hitTarget = false;
   }
   
   show = pushWrap( () => {
@@ -150,10 +164,23 @@ class Board {
       this.renderWalls();
       this.renderCurrentToken();
       this.renderSprites();
+      this.renderPlaceholders();
       this.renderBots();
       this.renderCounter();
+      this.renderTurnBest();
+      this.renderCollected();
   })
+  renderCollected() {
+    translate(0,width + squareSize/2)
+    drawTokenLine(sprites.filter((sprite) => sprite.collected));
+  }
   renderCounter = () => moveCounter.render();
+  renderTurnBest = pushWrap( () => {
+    textSize(24);
+    textAlign(RIGHT, BOTTOM);
+    fill('green');
+    text(turnBest, width, width * 17/16);
+  })
   renderGrid = pushWrap( () => {
     //Draw the boxes
     for (let i = 0; i < this.h; i ++) {
@@ -209,8 +236,18 @@ class Board {
       )
     )
   }
+  renderPlaceholders() {
+    robots.forEach( (robot) => robot.renderPlaceholder());
+  }
+
+  //returns true if a valid robot is sitting on the target sprite
   checkGoal() {
-    if (true){}
+    const onTarget = (robot) =>  robot.x == currentToken.x && robot.y == currentToken.y;
+    //If we are aiming for free square, check if ANY bot is touching
+    if (currentToken.colorName == 'white'){
+      return robots.some( (robot) => onTarget(robot))
+    }
+    return onTarget(robots.find( (robot) => robot.colorName == currentToken.colorName));
   }
 }
 class Space {
@@ -257,24 +294,7 @@ class Space {
   }
   
 }
-class Sprite {
-  constructor(x,y,size,drawFunc,color) {
-    this.x = x;
-    this.y = y;
-    this.size = size;
-    this.drawFunc = drawFunc;
-    this.colr = color;
-  }
-  render() {
-    this.drawFunc(this.size,this.colr);
-  }
-  dim(alph) {
-    this.colr = color(red(this.colr),green(this.colr),blue(this.colr),alph);
-  }
-  undim() {
-      this.colr = color(red(this.colr),green(this.colr),blue(this.colr),255);
-  }
-}
+
 function genWalls() {
   //Add the edges
   for (let i = 0; i < board.spaces.length; i++) {
@@ -362,15 +382,28 @@ function genSprites(spriteData) {
 function mousePressed(){
   let x = floor(mouseX / squareSize);
   let y = floor(mouseY / squareSize);
+  // console.log(`Clicked at ${int(mouseX)} ${int(mouseY)} which we take as ${x} ${y}`)
   for (let i = 0; i < robots.length; i++) {
     if (robots[i].x == x && robots[i].y == y) {
       currentRobot = robots[i];
       currentRobot.selected = true;
     }
   }
+  if (x >= 7 && x <= 8 && y >= 7 && y <= 8) {
+    //set to collected if anyone has reached it; presumably this is where put an assignToPlayer function
+    if (turnBest > 0) {
+      currentToken.collected = true;
+      currentToken.collectedIn = turnBest;
+      currentToken = getNextToken();
+      startTurn();
+      return;
+    }
+    currentToken = getNextToken();
+    resetTurn();
+  }
 }
 function keyPressed(){
-  if (inMotion || noMove) return;
+  if (inMotion) return;
   switch (keyCode) {
     case UP_ARROW:
       currentRobot.vel = [0,-1];
@@ -455,9 +488,10 @@ function preload() {
   click = loadSound('click.mp3');
 }
 function setup() {
-  createCanvas(700, 700 * 17/16);
-  background(0);
-  frameRate(45);
+  createCanvas(700, 820);
+  background(255);
+  frameRate(60);
+  hitTarget = false;
   squareSize = width/16;
   wallThickness = squareSize / 9;
   board = new Board(boardSize,boardSize,squareSize);
@@ -500,6 +534,8 @@ function startTurn() {
     robot.lastY = robot.y;
   });
   moveCounter.reset();
+  turnBest = 0;
+  noMove = false;
 }
 function resetTurn() {
   robots.forEach( (robot) => {
@@ -507,4 +543,29 @@ function resetTurn() {
     robot.y = robot.lastY;
   });
   moveCounter.reset();
+  noMove = false;
+}
+
+function updateTurnBest(n) {
+  if (turnBest == 0) turnBest = n;
+  else turnBest = min(turnBest, n);
+}
+
+drawTokenLine = pushWrap( (tokens) => {
+  textSize(16);
+  fill(0);
+  textAlign(CENTER, BOTTOM);
+  tokens.forEach( (token, i) => {
+    if (i == 8) translate( -8 * .75 * squareSize, squareSize * 1.2);
+    translate(.75 * squareSize, 0);
+    token.drawSmall();
+    text(token.collectedIn, 0, .75*squareSize);
+  });
+  translate(.75 * squareSize,0);
+  textAlign(CENTER, CENTER);
+  if (tokens.length) text(tokens.reduce((s, t) => s + t.collectedIn,0), 0,0);
+})
+
+function setAlpha(colr, alph) {
+  return color(red(colr),green(colr),blue(colr),alph);
 }

@@ -5,16 +5,18 @@ class Shape {
         this.x = x;
         this.y = y;
         this.collected = false;
+        this.collectedIn = 0;
     }
     draw(size){}
-    drawSmall() {
-        strokeWeight(3);
+    drawSmall = pushWrap( () => {
+        strokeWeight(2.5);
         fill(200);
         circle(0,0,.625 * squareSize);
-        this.draw(.5 * squareSize)
-    }
+        strokeWeight(1);
+        this.draw(.4 * squareSize)
+    })
     drawMed() {
-        this.draw(.8*squareSize)
+        this.draw(.75*squareSize)
     }
     drawLarge() {
         this.draw(1.5 * squareSize)
@@ -23,7 +25,7 @@ class Shape {
         this.drawMed();
     }
     dim(alph) {
-        this.color = color(red(this.color),green(this.color),blue(this.color),alph);
+        this.color = setAlpha(this.color,alph)
     }
     undim() {
         this.dim(255);
@@ -36,7 +38,7 @@ class Triangle extends Shape {
     }
     draw = pushWrap( (size) => {
         fill(this.color);
-        triangle(0, -size/2, -size/2, size/2, size/2, size/2);
+        triangle(0, -size/2, -(1/sqrt(3)) * size, size/2, (1/sqrt(3)) * size, size/2);
     })
 }
 class Square extends Shape {

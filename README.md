@@ -16,7 +16,9 @@ Try out the latest* version in the [p5 Editor](https://editor.p5js.org/briansmil
 
 -`r` to reset current solution attempt
 
--Clicking center shape claims token with current best move count (in green) or shuffles to a new token if not yet reached
+-Clicking center shape resets turn and selects a new token
+
+-Click collect next to player who proposed the fastest route
 
 -Full original game instructions [here](https://images-cdn.zmangames.com/us-east-1/filer_public/c0/b4/c0b482f1-ad3e-4e5d-ae48-0c11aa7c317a/en-ricochet_robot-rules.pdf)
 

@@ -5,3 +5,27 @@ html, body {
 canvas {
   display: block;
 }
+
+main {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+#canvas-box {
+  align-items: center;
+}
+#players {
+  display: flex;
+  flex-flow: column wrap;
+  height: 100px;
+}
+.score-button {
+  margin-right: .5em;
+}
+.player {
+  margin: .5em
+}

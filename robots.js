@@ -19,7 +19,9 @@ let inMotion = false;
 let noMove = false;
 let currentToken, tokens;
 let moveCounter, hitTarget, turnBest;
+let playerList = [];
 let gameOver;
+let firstFrame = true;
 
 class Counter {
   constructor(init = 0) {
@@ -177,6 +179,7 @@ class Board {
       this.renderCounter();
       this.renderTurnBest();
       this.renderCollected();
+      updateScores();
   })
   renderCollected() {
     translate(0,width + squareSize/2)
@@ -410,16 +413,9 @@ function mousePressed(){
   }
   if (x >= 7 && x <= 8 && y >= 7 && y <= 8) {
     if(gameOver) startGame();
-    //set to collected if anyone has reached it; presumably this is where put an assignToPlayer function
-    if (turnBest > 0) {
-      currentToken.collected = true;
-      currentToken.collectedIn = turnBest;
-      currentToken = getNextToken();
-      startTurn();
-      return;
-    }
     currentToken = getNextToken();
     if (!currentToken) gameOver = true;
+    turnBest = 0;
     resetTurn();
   }
 }
@@ -521,7 +517,8 @@ function preload() {
   click = loadSound('click.mp3');
 }
 function setup() {
-  createCanvas(700, 820);
+  canvas = createCanvas(700, 820);
+  canvas.parent('canvas-box');
   background(255);
   frameRate(60);
   moveCounter  = new Counter;
@@ -534,21 +531,86 @@ function setup() {
   robots.push(new Robot(-1,-1,'yellow'));
   genWalls();
   sprites = genSprites(spriteData);
-
+  currentRobot = robots[1];
+  noMove = true;
   startGame();
 }
 function draw() {
   clear();
   background(220);
   // if (frameCount % 15 == 0)console.log(inMotion);
-
+  if( !firstFrame && playerList.length == 0) {
+    initializePlayers();
+  }
+  firstFrame = false;
   board.update();
   board.show();
-  
+}
+class Player {
+  constructor(name, id) {
+    this.name = name;
+    this.id = id;
+    this.tokens = [];
+    this.elt;
+    this.textSpan;
+  }
+  collectToken() {
+    if (turnBest > 0) {
+      currentToken.collected = true;
+      currentToken.collectedIn = turnBest;
+      this.tokens.push(currentToken)
+      updateScores();
+      currentToken = getNextToken();
+      startTurn();
+    }
+  }
+  reset() {
+    this.tokens = [];
+  }
+}
+function askForPlayers() {
+  let numPlayers = parseInt(prompt("How many players?"));
+  if (isNaN(numPlayers) || numPlayers < 1) throw new Error("Invalid player number");
+  let players = Array.from({ length: numPlayers}, (_, i) => new Player(prompt(`Player ${i + 1}`), i));
+  return players;
 }
 
+function makePlayerDivs(players) {
+  const container = document.getElementById('players');
+  container.innerHTML = '';
 
+  players.forEach( (player) => {
+    const playerDiv = document.createElement('div');
+    playerDiv.id = `player-${player.id}`
+    playerDiv.className = `player`
+    const playerNameAndScore = document.createElement('span');
+    playerNameAndScore.id = `player-${player.id}-text`;
+    playerNameAndScore.textContent = `${player.name} ${player.tokens.length}`
 
+    const scoreButton = document.createElement('button');
+    scoreButton.className = 'score-button';
+    scoreButton.id = `score-player-${player.id}`;
+    scoreButton.textContent = 'Collect';
+    scoreButton.onclick = ( () => player.collectToken());
+    
+    player.elt = playerDiv;
+    player.textSpan = playerNameAndScore;
+    playerDiv.appendChild(scoreButton);
+    playerDiv.appendChild(playerNameAndScore);
+    container.appendChild(playerDiv);
+  })
+}
+
+function updateScores() {
+  if (playerList.length == 0) return;
+  playerList.forEach( (player) => {
+    player.textSpan.textContent = `${player.name} ${player.tokens.length}`
+  })
+}
+function initializePlayers() {
+  playerList = askForPlayers();
+  makePlayerDivs(playerList);
+}
 function pushWrap(fn) {
   return (...args) => {
     push();
@@ -604,11 +666,13 @@ function setAlpha(colr, alph) {
 
 function startGame() {
   gameOver = false;
+  noMove = false;
   moveCounter.reset();
   sprites.forEach( (sprite) => sprite.reset());
   hitTarget = false;
   currentRobot = robots[1];
   currentToken = getNextToken();
+  playerList.forEach( (player) => player.reset())
   placeBots();
   startTurn();
 }

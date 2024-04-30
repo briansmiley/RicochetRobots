@@ -210,7 +210,7 @@ class Board {
     )
   }
   checkGoal() {
-    if 
+    if (true){}
   }
 }
 class Space {
@@ -357,35 +357,6 @@ function genSprites(spriteData) {
 
   const makeShape = ({x, y, color, ShapeClass}) => new ShapeClass(x, y, color);
   return spriteData.map((sprite) => makeShape(sprite))
-
-  //Old sprite hardcoding; maintaining in case I copied anything wrong
-
-  // var sprites = [
-  //   new Sprite(1,2,squareSize,drawTriangle,'green'),
-  //   new Sprite(6,1,squareSize,drawSquare,'yellow'),
-  //   new Sprite(6,5,squareSize,drawSquare,'blue'),
-  //   new Sprite(3,6,squareSize,drawCircle,'red'),
-  //   new Sprite(7,12,squareSize,drawBurst,'red'),
-  //   new Sprite(9,1,squareSize,drawSquare,'green'),
-  //   new Sprite(4,9,squareSize,drawTriangle,'yellow'),
-  //   new Sprite(6,10,squareSize,drawCircle,'blue'),
-  //   new Sprite(8,10,squareSize,drawCircle,'yellow'),
-  //   new Sprite(10,4,squareSize,drawSquare,'red'),
-  //   new Sprite(14,2,squareSize,drawStar,'yellow'),
-  //   new Sprite(12,6,squareSize,drawTriangle,'blue'),
-  //   new Sprite(3,14,squareSize,drawStar,'green'),
-  //   new Sprite(1,13,squareSize,drawStar,'red'),
-  //   new Sprite(9,13,squareSize,drawCircle,'green'),
-  //   new Sprite(13,11,squareSize,drawStar,'blue'),
-  //   new Sprite(14,14,squareSize,drawTriangle,'red'),
-  //   new Sprite(7,7,squareSize,drawBlock,[200,200,200]),
-  //   new Sprite(7,8,squareSize,drawBlock,[200,200,200]),
-  //   new Sprite(8,7,squareSize,drawBlock,[200,200,200]),
-  //   new Sprite(8,8,squareSize,drawBlock,[200,200,200])
-  // ]
-  // for (let i = 0; i < sprites.length;i++){
-  //   board.addSprite(sprites[i]);
-  // }
 }
 
 function mousePressed(){

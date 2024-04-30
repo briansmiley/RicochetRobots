@@ -1,6 +1,7 @@
 class Shape {
-    constructor(x, y, color = null) {
-        this.color = color
+    constructor(x, y, colr = null) {
+        this.color = color(colr)
+        this.colorName = colr
         this.x = x;
         this.y = y;
         this.collected = false;

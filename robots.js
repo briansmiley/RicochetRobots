@@ -11,6 +11,7 @@ let inMotion = false;
 let noMove = false;
 let currentToken, tokens;
 let moveCounter, hitTarget, turnBest;
+let gameOver;
 
 class Counter {
   constructor(init = 0) {
@@ -401,6 +402,7 @@ function mousePressed(){
     }
   }
   if (x >= 7 && x <= 8 && y >= 7 && y <= 8) {
+    if(gameOver) startGame();
     //set to collected if anyone has reached it; presumably this is where put an assignToPlayer function
     if (turnBest > 0) {
       currentToken.collected = true;
@@ -410,6 +412,7 @@ function mousePressed(){
       return;
     }
     currentToken = getNextToken();
+    if (!currentToken) gameOver = true;
     resetTurn();
   }
 }
@@ -514,7 +517,7 @@ function setup() {
   createCanvas(700, 820);
   background(255);
   frameRate(60);
-  hitTarget = false;
+  moveCounter  = new Counter;
   squareSize = width/16;
   wallThickness = squareSize / 9;
   board = new Board(boardSize,boardSize,squareSize);
@@ -523,12 +526,9 @@ function setup() {
   robots.push(new Robot(-1,-1,'green'));
   robots.push(new Robot(-1,-1,'yellow'));
   genWalls();
-  currentRobot = robots[1];
   sprites = genSprites(spriteData);
-  placeBots();
-  currentToken = getNextToken();
-  moveCounter  = new Counter;
-  startTurn();
+
+  startGame();
 }
 function draw() {
   clear();
@@ -558,7 +558,6 @@ function startTurn() {
   });
   moveCounter.reset();
   turnBest = 0;
-  if (!currentToken) gameOver();
   noMove = false;
 }
 function resetTurn() {
@@ -596,6 +595,13 @@ function setAlpha(colr, alph) {
   return color(red(colr),green(colr),blue(colr),alph);
 }
 
-function gameOver() {
-
+function startGame() {
+  gameOver = false;
+  moveCounter.reset();
+  sprites.forEach( (sprite) => sprite.reset());
+  hitTarget = false;
+  currentRobot = robots[1];
+  currentToken = getNextToken();
+  placeBots();
+  startTurn();
 }

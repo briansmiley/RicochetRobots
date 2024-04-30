@@ -30,6 +30,10 @@ class Shape {
     undim() {
         this.dim(255);
     }
+    reset() {
+        this.collected = false;
+        this.collectedIn = 0;
+    }
 }
 
 class Triangle extends Shape {

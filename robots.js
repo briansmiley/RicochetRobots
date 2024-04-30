@@ -229,6 +229,10 @@ class Board {
       push()
       fill(0);
       circle(0,0,squareSize * 1.8)
+      fill(255)
+      textAlign(CENTER, CENTER);
+      textSize(36)
+      text(totalMoves(sprites),0,0)
       pop()
     }
   })
@@ -583,9 +587,11 @@ drawTokenLine = pushWrap( (tokens) => {
   });
   translate(.75 * squareSize,0);
   textAlign(CENTER, CENTER);
-  if (tokens.length) text(tokens.reduce((s, t) => s + t.collectedIn,0), 0,0);
+  if (tokens.length) text(totalMoves(tokens), 0,0);
 })
-
+function totalMoves(tokens) {
+  return tokens.reduce((s, t) => s + t.collectedIn,0)
+}
 function setAlpha(colr, alph) {
   return color(red(colr),green(colr),blue(colr),alph);
 }

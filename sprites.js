@@ -1,12 +1,18 @@
-//EXAMPLE CREATION
+blueTriSprite = new Sprite(drawTriangle, 'blue')
 
-blueStar = new Sprite(squareSize, drawStar, blue)
+class Triangle extends Sprite {
+  constructor(color, type = 'right') {
+    super(color);
+  }
 
-blueStar.render()
+  draw(size) {
+    // Draw a triangle
+  }
+}
+
+
 class Sprite {
-  constructor(size,drawFunc,color) {
-    this.x = -1;
-    this.y = -1;
+  constructor(color) {
     this.size = size;
     this.drawFunc = drawFunc;
     this.colr = color;
@@ -15,20 +21,27 @@ class Sprite {
   }
 
   //Creates a new graphics object and draws the draw function there with all current parameters
-  draw() {
-    let icon = createGraphics(this.size, this.size);
-    this.drawFunc(icon, this.colr);
-    this.icon = icon;
+  // draw() {
+  //   let icon = createGraphics(this.size, this.size);
+  //   this.drawFunc(icon, this.colr);
+  //   this.icon = icon;
+  // }
+
+  draw(size) {}
+
+  drawSmall(dimmed = false) {
+    if (this.dimmed) {
+    }
+    this.draw(squareSize - padding);
   }
-  //Assigns x, y coords on the main canvas
-  position(x, y) {
-    this.x = x;
-    this.y = y;
+
+  drawBig() {
+    this.draw((squareSize * 4) - padding);
   }
-  //Draws the sprite to its coordinates on the main canvas
-  render() {
-    if (this.x < 0 || this.y < 0) throw new Error(`Sprite ${this.drawFunc.name} is not positioned`);
-    else image(this.icon, this.x, this.y);
+
+  //Draws the sprite to given coordinates at given size on main canvas
+  render(x, y ) {
+    image(this.icon, x, y,);
   }
 
   dim(alph) {

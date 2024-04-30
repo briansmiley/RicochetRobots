@@ -10,7 +10,28 @@ let thunk;
 let inMotion = false;
 let noMove = false;
 let currentToken, tokens;
+let moveCounter;
 
+class Counter {
+  constructor(init = 0) {
+    this.count = init;
+  }
+  increment(n = 1) {
+    this.count += n;
+  }
+  set(n) {
+    this.count = n;
+  }
+  reset() {
+    this.set(0);
+  }
+  render = pushWrap( (x = width/2, y = width + squareSize) => {
+    fill(0);
+    textSize(32);
+    textAlign(CENTER, BOTTOM);
+    text(this.count, x, y);
+  })
+}
 class Robot {
   constructor(x,y,color){
     this.x = x;
@@ -34,7 +55,10 @@ class Robot {
   })
   stop() {
     this.vel=[0,0];
-    if(inMotion) click.play();
+    if(inMotion) {
+      click.play();
+      moveCounter.increment();
+    }
     inMotion = false;
   }
   move(){
@@ -117,6 +141,7 @@ class Board {
   }
   update(){
     currentRobot.move();
+    this.checkGoal();
   }
   
   show = pushWrap( () => {
@@ -125,8 +150,10 @@ class Board {
       this.renderWalls();
       this.renderCurrentToken();
       this.renderSprites();
-      this.renderBots();;
+      this.renderBots();
+      this.renderCounter();
   })
+  renderCounter = () => moveCounter.render();
   renderGrid = pushWrap( () => {
     //Draw the boxes
     for (let i = 0; i < this.h; i ++) {
@@ -181,6 +208,9 @@ class Board {
         }
       )
     )
+  }
+  checkGoal() {
+    if 
   }
 }
 class Space {
@@ -358,16 +388,6 @@ function genSprites(spriteData) {
   // }
 }
 
-class Token {
-  constructor(sprite) {
-    this.sprite = sprite;
-    this.collected = false;
-  }
-
-  draw() {
-    this.sprite.drawLarge();
-  }
-}
 function mousePressed(){
   let x = floor(mouseX / squareSize);
   let y = floor(mouseY / squareSize);
@@ -392,10 +412,14 @@ function keyPressed(){
       break;
     case RIGHT_ARROW:
       currentRobot.vel = [1,0];
-      break; 
-    
+      break;
+    default:
+      switch (key) {
+        case 'r':
+          resetTurn();
+          break;
+      }
   }
-  
 }
 function placeBots(){
   robots.forEach( (robot) => {
@@ -431,7 +455,7 @@ spriteData = [
   {x: 6, y: 1, ShapeClass: Square, color: 'yellow'},
   {x: 6, y: 5, ShapeClass: Square, color: 'blue'},
   {x: 3, y: 6, ShapeClass: Circle, color: 'red'},
-  {x: 7, y: 12, ShapeClass: Burst, color: 'gray'},
+  {x: 7, y: 12, ShapeClass: Burst, color: 'white'},
   {x: 9, y: 1, ShapeClass: Square, color: 'green'},
   {x: 4, y: 9, ShapeClass: Triangle, color: 'yellow'},
   {x: 6, y: 10, ShapeClass: Circle, color: 'blue'},
@@ -460,8 +484,8 @@ function preload() {
   click = loadSound('click.mp3');
 }
 function setup() {
-  createCanvas(700, 700);
-  background(255);
+  createCanvas(700, 700 * 17/16);
+  background(0);
   frameRate(45);
   squareSize = width/16;
   wallThickness = squareSize / 9;
@@ -475,6 +499,8 @@ function setup() {
   sprites = genSprites(spriteData);
   placeBots();
   currentToken = getNextToken();
+  moveCounter  = new Counter;
+  startTurn();
 }
 function draw() {
   clear();
@@ -495,4 +521,19 @@ function pushWrap(fn) {
     pop();
     return res;
   }
+}
+
+function startTurn() {
+  robots.forEach( (robot) => {
+    robot.lastX = robot.x;
+    robot.lastY = robot.y;
+  });
+  moveCounter.reset();
+}
+function resetTurn() {
+  robots.forEach( (robot) => {
+    robot.x = robot.lastX;
+    robot.y = robot.lastY;
+  });
+  moveCounter.reset();
 }

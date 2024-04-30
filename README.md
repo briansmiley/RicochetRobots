@@ -10,6 +10,10 @@ Try out the latest* version in the [p5 Editor](https://editor.p5js.org/briansmil
          
 -`w` `a` `s` `d` or `↑` `←` `↓` `→` to move
 
+-Robots move until they hit a wall or another robot
+
+-Goal is to make the matching color robot reach the target shape in as few moves as possible (rainbow shape can be reached by any color)
+
 -`r` to reset current solution attempt
 
 -Clicking center shape claims token with current best move count (in green) or shuffles to a new token if not yet reached

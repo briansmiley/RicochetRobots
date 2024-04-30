@@ -517,7 +517,8 @@ function preload() {
   click = loadSound('click.mp3');
 }
 function setup() {
-  canvas = createCanvas(700, 820);
+  let w = min(windowWidth, (windowHeight - 100)/1.2);
+  canvas = createCanvas(w, w * 1.17);
   canvas.parent('canvas-box');
   background(255);
   frameRate(60);

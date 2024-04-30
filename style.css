@@ -22,10 +22,17 @@ main {
   display: flex;
   flex-flow: column wrap;
   height: 100px;
+  min-width: 250px;
+  /* margin: 0, 5, 0, 5; */
 }
 .score-button {
   margin-right: .5em;
 }
 .player {
-  margin: .5em
+  display: flex;
+  justify-content: center;
+  margin: .2em
+}
+.hidden {
+  display: none;
 }

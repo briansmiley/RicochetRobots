@@ -3,7 +3,7 @@ let squareSize, wallThickness;
 let board;
 let padding = 5;
 let robots = [];
-let spriteData, sprites, placeKeepers;
+let spriteData, sprites;
 let currentRobot;
 let click;
 let thunk;

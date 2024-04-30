@@ -1,3 +1,11 @@
+/*
+Ricochet Robots
+
+-WASD/Arrow keys to move
+-r to reset current attempt
+-click center shape to claim with current best or to shuffle if not yet reached
+*/
+
 const boardSize = 16;
 let squareSize, wallThickness;
 let board;

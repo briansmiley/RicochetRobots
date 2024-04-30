@@ -224,7 +224,13 @@ class Board {
   }
   renderCurrentToken = pushWrap( () => {
     translate(squareSize * this.w/2, squareSize * this.h/2);
-    currentToken.drawLarge();
+    if(currentToken) currentToken.drawLarge();
+    else {
+      push()
+      fill(0);
+      circle(0,0,squareSize * 1.8)
+      pop()
+    }
   })
   renderBots() {
     robots.forEach(
@@ -242,6 +248,7 @@ class Board {
 
   //returns true if a valid robot is sitting on the target sprite
   checkGoal() {
+    if(!currentToken) return false;
     const onTarget = (robot) =>  robot.x == currentToken.x && robot.y == currentToken.y;
     //If we are aiming for free square, check if ANY bot is touching
     if (currentToken.colorName == 'white'){
@@ -547,6 +554,7 @@ function startTurn() {
   });
   moveCounter.reset();
   turnBest = 0;
+  if (!currentToken) gameOver();
   noMove = false;
 }
 function resetTurn() {
@@ -580,4 +588,8 @@ drawTokenLine = pushWrap( (tokens) => {
 
 function setAlpha(colr, alph) {
   return color(red(colr),green(colr),blue(colr),alph);
+}
+
+function gameOver() {
+
 }

@@ -179,7 +179,7 @@ class Board {
       this.renderCounter();
       this.renderTurnBest();
       this.renderCollected();
-      updateScores();
+      updatePlayers();
   })
   renderCollected() {
     translate(0,width + squareSize/2)
@@ -527,9 +527,9 @@ function setup() {
   wallThickness = squareSize / 9;
   board = new Board(boardSize,boardSize,squareSize);
   robots.push(new Robot(-1,-1,'red'));
-  robots.push(new Robot(-1,-1,'blue'));
-  robots.push(new Robot(-1,-1,'green'));
   robots.push(new Robot(-1,-1,'yellow'));
+  robots.push(new Robot(-1,-1,'green'));
+  robots.push(new Robot(-1,-1,'blue'));
   genWalls();
   sprites = genSprites(spriteData);
   currentRobot = robots[1];
@@ -554,13 +554,13 @@ class Player {
     this.tokens = [];
     this.elt;
     this.textSpan;
+    this.scoreButton;
   }
   collectToken() {
     if (turnBest > 0) {
       currentToken.collected = true;
       currentToken.collectedIn = turnBest;
       this.tokens.push(currentToken)
-      updateScores();
       currentToken = getNextToken();
       startTurn();
     }
@@ -596,16 +596,24 @@ function makePlayerDivs(players) {
     
     player.elt = playerDiv;
     player.textSpan = playerNameAndScore;
+    player.scoreButton = scoreButton;
     playerDiv.appendChild(scoreButton);
     playerDiv.appendChild(playerNameAndScore);
     container.appendChild(playerDiv);
   })
 }
 
-function updateScores() {
+function updatePlayers() {
   if (playerList.length == 0) return;
+  if (turnBest == 0) {
+
+  }
   playerList.forEach( (player) => {
     player.textSpan.textContent = `${player.name} ${player.tokens.length}`
+    //If the goal hasnt been reached yet, hide the Collect buttons
+    turnBest == 0 ? 
+      player.scoreButton.classList.add('hidden') :
+      player.scoreButton.classList.remove('hidden')
   })
 }
 function initializePlayers() {

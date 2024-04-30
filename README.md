@@ -7,7 +7,7 @@ Try out the latest* version in the [p5 Editor](https://editor.p5js.org/briansmil
 **Instructions**
 -
 -Click to select a robot
-
+         
 -`w` `a` `s` `d` or `↑` `←` `↓` `→` to move
 
 -`r` to reset current solution attempt
@@ -19,7 +19,7 @@ Try out the latest* version in the [p5 Editor](https://editor.p5js.org/briansmil
 
 <span style="font-size:.75em;">*as of 4/30/24</span>
 
-![App screenshot](./images/canvas.png)
+![App screenshot](./images/gameplay.png)
 *App screenshot*
 
 ![Box art](./images/ricochet_robots_box.png)

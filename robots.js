@@ -422,6 +422,18 @@ function keyPressed(){
         case 'r':
           resetTurn();
           break;
+        case 'w':
+          currentRobot.vel = [0,-1];
+          break;
+        case 's':
+          currentRobot.vel = [0,1];
+          break;
+        case 'a':
+          currentRobot.vel = [-1,0];
+          break;
+        case 'd':
+          currentRobot.vel = [1,0];
+          break;
       }
   }
 }

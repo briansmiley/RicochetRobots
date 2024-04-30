@@ -22,6 +22,8 @@ let moveCounter, hitTarget, turnBest;
 let playerList = [];
 let gameOver;
 let firstFrame = true;
+let roboSounds, victorySound;
+const noBloops = true;
 
 class Counter {
   constructor(init = 0) {
@@ -44,7 +46,7 @@ class Counter {
   })
 }
 class Robot {
-  constructor(x,y,colr){
+  constructor(x,y,colr, sound = null){
     this.x = x;
     this.y = y;
     this.lastX = x;
@@ -53,6 +55,16 @@ class Robot {
     this.colorName = colr;
     this.vel = [0,0];
     this.selected = false;
+    this.sound = sound;
+  }
+  speak() {
+    if(!this.sound || noBloops) return;
+    this.sound.play();
+  }
+  select() {
+    this.speak();
+    this.selected = true;
+    currentRobot = this;
   }
   place(x,y) {
     this.x = x;
@@ -161,6 +173,7 @@ class Board {
   update(){
     currentRobot.move();
     if (this.checkGoal()) {
+      if (!hitTarget) victorySound.play();
       hitTarget = true;
       updateTurnBest(moveCounter.count + 1);
       noMove = true;
@@ -405,12 +418,12 @@ function mousePressed(){
   let x = floor(mouseX / squareSize);
   let y = floor(mouseY / squareSize);
   // console.log(`Clicked at ${int(mouseX)} ${int(mouseY)} which we take as ${x} ${y}`)
-  for (let i = 0; i < robots.length; i++) {
-    if (robots[i].x == x && robots[i].y == y) {
-      currentRobot = robots[i];
-      currentRobot.selected = true;
+
+  robots.forEach( (robot) => {
+    if (robot.x == x && robot.y == y) {
+      robot.select();
     }
-  }
+  })
   if (x >= 7 && x <= 8 && y >= 7 && y <= 8) {
     if(gameOver) startGame();
     currentToken = getNextToken();
@@ -514,7 +527,12 @@ function getNextToken() {
 
 
 function preload() {
-  click = loadSound('click.mp3');
+  click = loadSound('sound/click.mp3');
+  roboSounds = Array.from({length: 4}, (_, i) => loadSound(`./sound/interface/question_00${i + 1}.ogg`))
+  roboSounds.forEach( (sound) => sound.setVolume(.1))
+  click.setVolume(.5);
+  victorySound = loadSound('./sound/interface/confirmation_004.ogg')
+  victorySound.setVolume(.2);
 }
 function setup() {
   let w = min(windowWidth, (windowHeight - 100)/1.2);
@@ -526,10 +544,7 @@ function setup() {
   squareSize = width/16;
   wallThickness = squareSize / 9;
   board = new Board(boardSize,boardSize,squareSize);
-  robots.push(new Robot(-1,-1,'red'));
-  robots.push(new Robot(-1,-1,'yellow'));
-  robots.push(new Robot(-1,-1,'green'));
-  robots.push(new Robot(-1,-1,'blue'));
+  ['red', 'yellow', 'green', 'blue'].forEach( (color, i) => robots.push(new Robot(-1,-1,color, roboSounds[i])));
   genWalls();
   sprites = genSprites(spriteData);
   currentRobot = robots[1];

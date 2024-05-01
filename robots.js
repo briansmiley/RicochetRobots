@@ -585,7 +585,10 @@ class Player {
   }
 }
 function askForPlayers() {
-  let numPlayers = parseInt(prompt("How many players?"));
+  let numPlayers = null;
+  while (isNaN(numPlayers) || numPlayers === null || numPlayers < 1) {
+    numPlayers = parseInt(prompt("How many players?"));
+  }
   if (isNaN(numPlayers) || numPlayers < 1) throw new Error("Invalid player number");
   let players = Array.from({ length: numPlayers}, (_, i) => new Player(prompt(`Player ${i + 1}`), i));
   return players;

@@ -17,6 +17,7 @@ main {
 }
 #canvas-box {
   align-items: center;
+  margin-top: 1rem;
 }
 #players {
   display: flex;

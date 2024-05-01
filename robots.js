@@ -521,7 +521,7 @@ function getNextToken() {
   if (sprites.every( (sprite) => sprite.collected)) return false;
   while(true) {
     let s = sprites[int(random(sprites.length))];
-    if (!s.collected) return s;
+    if (!s.collected && s != currentSprite) return s;
   }
 }
 

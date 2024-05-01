@@ -2,7 +2,7 @@
 
 My (very WIP) [p5.js](https://p5js.org/) implementation of the out-of-print, surprisingly fun mental-shape-translation game [Ricochet Robots](https://en.wikipedia.org/wiki/Ricochet_Robots)
 
-Try out the latest* version in the [p5 Editor](https://editor.p5js.org/briansmiley/sketches/LJjfo8k1P)
+Try out the latest* version on [my site](https://briansmiley.github.io/p5/ricochetrobots/) or fiddle with the code in in the [p5 Editor](https://editor.p5js.org/briansmiley/sketches/LJjfo8k1P)
 
 **Instructions**
 -

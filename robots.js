@@ -590,7 +590,7 @@ function askForPlayers() {
     numPlayers = parseInt(prompt("How many players?"));
   }
   if (isNaN(numPlayers) || numPlayers < 1) throw new Error("Invalid player number");
-  let players = Array.from({ length: numPlayers}, (_, i) => new Player(prompt(`Player ${i + 1}`), i));
+  let players = Array.from({ length: numPlayers}, (_, i) => new Player(prompt(`Player ${i + 1} name`), i));
   return players;
 }
 

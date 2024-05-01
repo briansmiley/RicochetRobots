@@ -31,7 +31,8 @@ main {
 .player {
   display: flex;
   justify-content: center;
-  margin: .2em
+  margin: .2em;
+  min-height: 22px;
 }
 .hidden {
   display: none;

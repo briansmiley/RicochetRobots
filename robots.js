@@ -598,13 +598,19 @@ class Player {
 }
 function askForPlayers() {
   let numPlayers = null;
+  let cancelled = false
+  let players;
   while (isNaN(numPlayers) || numPlayers < 1 ) {
     input = prompt("How many players?");
     console.log(input);
-    if (input === null) break;
+    if (input === null) {
+      cancelled = true;
+      break;
+    }
     numPlayers = parseInt(input);
   }
-  let players = Array.from({ length: numPlayers}, (_, i) => new Player(prompt(`Player ${i + 1} name`), i));
+  if (cancelled) players = [new Player(`Player 1`, 0)];
+  else players = Array.from({ length: numPlayers}, (_, i) => new Player(prompt(`Player ${i + 1} name`), i));
   return players;
 }
 
@@ -618,7 +624,7 @@ function makePlayerDivs(players) {
     playerDiv.className = `player`
     const playerNameAndScore = document.createElement('span');
     playerNameAndScore.id = `player-${player.id}-text`;
-    playerNameAndScore.textContent = `${player.name} ${player.tokens.length}`
+    playerNameAndScore.textContent = `${player.name}: ${player.tokens.length}`
 
     const scoreButton = document.createElement('button');
     scoreButton.className = 'score-button';
@@ -641,7 +647,7 @@ function updatePlayers() {
 
   }
   playerList.forEach( (player) => {
-    player.textSpan.textContent = `${player.name} ${player.tokens.length}`
+    player.textSpan.textContent = `${player.name}: ${player.tokens.length}`
     //If the goal hasnt been reached yet, hide the Collect buttons
     turnBest == 0 ? 
       player.scoreButton.classList.add('hidden') :

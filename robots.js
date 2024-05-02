@@ -331,6 +331,18 @@ class Space {
   
 }
 
+
+function completeWalls(spaces) {
+  spaces.forEach( (row, r) => {
+    spaces.forEach( (space, c) => {
+      if (r > 0 && spaces[r - 1][c].southWall) space.addWall('n');
+      if (r < spaces.length - 1 && spaces[r + 1][c].northWall) space.addWall('s');
+      if (c > 0 && spaces[r][c - 1].eastWall) space.addWall('w');
+      if (c < row.length && spaces[r][c + 1].westWall) space.addWall('e');
+    })
+  })
+}
+
 function genWalls() {
   //Add the edges
   for (let i = 0; i < board.spaces.length; i++) {
@@ -406,7 +418,7 @@ function genWalls() {
   
   board.spaces[15][4].addWall('e');
   board.spaces[15][11].addWall('e');
-  
+  completeWalls();
 }
 
 function genSprites(spriteData) {

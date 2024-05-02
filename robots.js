@@ -108,7 +108,7 @@ class Robot {
     //If moving right
     if (this.vel[0] == 1) {
       //Stop at edge of board or if there's a wall to your east
-      if (this.x == board.spaces[this.y].length - 1|| currentSquare.eastWall || board.spaces[this.y][this.x + 1].westWall) {
+      if (this.x == board.spaces[this.y].length - 1 || currentSquare.eastWall) {
         this.stop();
         return;
       } else {
@@ -119,7 +119,7 @@ class Robot {
     //If moving left
     if (this.vel[0] == -1) {
       //Stop if at left edge or there's a western wall
-      if (this.x == 0 || currentSquare.westWall || board.spaces[this.y][this.x - 1].eastWall) {
+      if (this.x == 0 || currentSquare.westWall) {
         this.stop();
         return;
       }else {
@@ -130,7 +130,7 @@ class Robot {
     //If moving down
     if (this.vel[1] == 1) {
       //Stop if on last row or wall below
-      if (this.y == board.spaceslength - 1 || currentSquare.southWall || board.spaces[this.y + 1][this.x].northWall) {
+      if (this.y == board.spaceslength - 1 || currentSquare.southWall) {
         this.stop();
         return;
       } else {
@@ -141,7 +141,7 @@ class Robot {
     //If moving up
     if (this.vel[1] == -1) {
       //Stop if at top
-      if (this.y == 0 || currentSquare.northWall || board.spaces[this.y - 1][this.x].southWall) {
+      if (this.y == 0 || currentSquare.northWall) {
         this.stop();
         return;
       } else {
@@ -334,11 +334,11 @@ class Space {
 
 function completeWalls(spaces) {
   spaces.forEach( (row, r) => {
-    spaces.forEach( (space, c) => {
+    row.forEach( (space, c) => {
       if (r > 0 && spaces[r - 1][c].southWall) space.addWall('n');
       if (r < spaces.length - 1 && spaces[r + 1][c].northWall) space.addWall('s');
       if (c > 0 && spaces[r][c - 1].eastWall) space.addWall('w');
-      if (c < row.length && spaces[r][c + 1].westWall) space.addWall('e');
+      if (c < row.length - 1 && spaces[r][c + 1].westWall) space.addWall('e');
     })
   })
 }
@@ -418,7 +418,7 @@ function genWalls() {
   
   board.spaces[15][4].addWall('e');
   board.spaces[15][11].addWall('e');
-  completeWalls();
+  completeWalls(board.spaces);
 }
 
 function genSprites(spriteData) {

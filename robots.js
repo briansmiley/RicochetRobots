@@ -21,7 +21,6 @@ let currentToken, tokens;
 let moveCounter, hitTarget, turnBest;
 let playerList = [];
 let gameOver;
-let firstFrame = true;
 let roboSounds, victorySound;
 const noBloops = true;
 
@@ -568,10 +567,10 @@ function draw() {
   clear();
   background(220);
   // if (frameCount % 15 == 0)console.log(inMotion);
-  if( !firstFrame && playerList.length == 0) {
+  if( frameCount == 2 && playerList.length == 0) {
     initializePlayers();
+    secondFrame = true;
   }
-  firstFrame = false;
   board.update();
   board.show();
 }
@@ -599,10 +598,12 @@ class Player {
 }
 function askForPlayers() {
   let numPlayers = null;
-  while (isNaN(numPlayers) || numPlayers === null || numPlayers < 1) {
-    numPlayers = parseInt(prompt("How many players?"));
+  while (isNaN(numPlayers) || numPlayers < 1 ) {
+    input = prompt("How many players?");
+    console.log(input);
+    if (input === null) break;
+    numPlayers = parseInt(input);
   }
-  if (isNaN(numPlayers) || numPlayers < 1) throw new Error("Invalid player number");
   let players = Array.from({ length: numPlayers}, (_, i) => new Player(prompt(`Player ${i + 1} name`), i));
   return players;
 }

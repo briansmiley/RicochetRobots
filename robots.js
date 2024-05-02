@@ -79,7 +79,7 @@ class Robot {
   renderPlaceholder = pushWrap( () => {
     fill(setAlpha(this.color, 100));
     strokeWeight(1);
-    stroke(this.color);
+    this.colorName == 'yellow' ? stroke (`#AA0`) : stroke(this.color);
     circle((this.lastX + .5) * squareSize, (this.lastY + .5) * squareSize, .9*squareSize);
   })
 

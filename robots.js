@@ -23,7 +23,7 @@ let moveCounter, hitTarget, turnBest;
 let playerList = [];
 let gameOver;
 let roboSounds, victorySound;
-const noBloops = true;
+const noBloops = true; //stop robots from speaking
 
 class Counter {
   constructor(init = 0) {
@@ -586,14 +586,13 @@ class Player {
   }
   collectToken() {
     if (sprites.every( (s) => s.collected)) return;
-    if (turnBest > 0) {
-      currentToken.collected = true;
-      currentToken.collectedIn = turnBest;
-      this.tokens.push(currentToken)
-      collectedTokens.push(currentToken);
-      currentToken = getNextToken();
-      startTurn();
-    }
+    // if (turnBest < 1 && !confirm(`Collect with move count of ${turnBest}?`)) return;
+    currentToken.collected = true;
+    currentToken.collectedIn = turnBest;
+    this.tokens.push(currentToken)
+    collectedTokens.push(currentToken);
+    currentToken = getNextToken();
+    startTurn();
   }
   reset() {
     this.tokens = [];

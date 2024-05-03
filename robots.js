@@ -782,7 +782,7 @@ class Timer {
   }
   render = pushWrap( () => {
     textSize(32);
-    fill(0);
+    fill(this.remaining() == 0 ? 'red' : 0);
     text(`${parseInt(this.remaining()/1000)}`,0,0)
   })
 }

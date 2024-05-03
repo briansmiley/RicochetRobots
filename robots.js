@@ -18,6 +18,7 @@ let thunk;
 let inMotion = false;
 let noMove = false;
 let currentToken, tokens;
+let collectedTokens = [];
 let moveCounter, hitTarget, turnBest;
 let playerList = [];
 let gameOver;
@@ -196,7 +197,7 @@ class Board {
   })
   renderCollected() {
     translate(0,width + squareSize/2)
-    drawTokenLine(sprites.filter((sprite) => sprite.collected));
+    drawTokenLine(collectedTokens);
   }
   renderCounter = () => moveCounter.render();
   renderTurnBest = pushWrap( () => {
@@ -438,7 +439,7 @@ function mousePressed(){
   })
   if (x >= 7 && x <= 8 && y >= 7 && y <= 8) {
     if(gameOver) startGame();
-    currentToken = getNextToken();
+    currentToken = (sprites.filter((s) => !s.collected).length == 1) ? currentToken : getNextToken();
     if (!currentToken) gameOver = true;
     turnBest = 0;
     resetTurn();
@@ -584,10 +585,12 @@ class Player {
     this.scoreButton;
   }
   collectToken() {
+    if (sprites.every( (s) => s.collected)) return;
     if (turnBest > 0) {
       currentToken.collected = true;
       currentToken.collectedIn = turnBest;
       this.tokens.push(currentToken)
+      collectedTokens.push(currentToken);
       currentToken = getNextToken();
       startTurn();
     }

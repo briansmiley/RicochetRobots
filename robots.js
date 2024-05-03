@@ -41,9 +41,9 @@ class Counter {
   }
   render = pushWrap( (x = width/2, y = width + squareSize) => {
     fill(0);
-    textSize(32);
+    textSize(24);
     textAlign(CENTER, BOTTOM);
-    text(this.count, x, y);
+    text(`Moves: ${this.count > 0 ? this.count : `-`}`, x, y);
   })
 }
 class Robot {
@@ -208,10 +208,10 @@ class Board {
   })
   renderCounter = () => moveCounter.render();
   renderTurnBest = pushWrap( () => {
-    textSize(24);
+    textSize(16);
     textAlign(RIGHT, BOTTOM);
     fill('green');
-    text(turnBest, width, width * 17/16);
+    text(`Best: ${turnBest > 0 ? turnBest : `-`}`, width, width * 17/16);
   })
   renderGrid = pushWrap( () => {
     //Draw the boxes

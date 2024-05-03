@@ -3,14 +3,20 @@
   <head>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/addons/p5.sound.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="style.css">
+    <link rel="stylesheet" type="text/css" href="style.css" />
     <meta charset="utf-8" />
-
   </head>
   <body>
     <main>
-      <div id="canvas-box"></div>
-      <div id="players">
+      <div id="canvas-box">
+        <div id="canvas-here"></div>
+        <div id="under-canvas">
+          <div></div>
+          <div id="players"></div>
+          <div id="timer-button-container">
+            <button id="timer-button">Start</button>
+          </div>
+        </div>
       </div>
     </main>
     <script src="shapes.js"></script>

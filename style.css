@@ -19,12 +19,27 @@ main {
   align-items: center;
   margin-top: 1rem;
 }
+#under-canvas {
+  display: flex;
+  margin-top: .5em;
+  justify-content: space-between;
+}
+#under-canvas > * {
+  flex: 1;
+}
 #players {
   display: flex;
   flex-flow: column wrap;
+  align-items:center;
   height: 100px;
   min-width: 250px;
+  flex: 9;
   /* margin: 0, 5, 0, 5; */
+}
+#timer-button-container {
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-start;
 }
 .score-button {
   margin-right: .5em;

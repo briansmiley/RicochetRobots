@@ -23,6 +23,7 @@ let moveCounter, hitTarget, turnBest;
 let playerList = [];
 let gameOver;
 let roboSounds, victorySound;
+let turnTimer;
 const noBloops = true; //stop robots from speaking
 
 class Counter {
@@ -193,12 +194,18 @@ class Board {
       this.renderCounter();
       this.renderTurnBest();
       this.renderCollected();
+      this.renderTimer();
       updatePlayers();
   })
-  renderCollected() {
+  renderTimer = pushWrap( () => {
+    textAlign(RIGHT, BOTTOM);
+    translate(width, height);
+    turnTimer.render();
+  })
+  renderCollected = pushWrap( () => {
     translate(0,width + squareSize/2)
     drawTokenLine(collectedTokens);
-  }
+  })
   renderCounter = () => moveCounter.render();
   renderTurnBest = pushWrap( () => {
     textSize(24);
@@ -549,10 +556,11 @@ function preload() {
 }
 function setup() {
   let w = min(windowWidth, (windowHeight - 100)/1.2);
-  canvas = createCanvas(w, w * 1.17);
-  canvas.parent('canvas-box');
+  let canvas = createCanvas(w, w * 1.17);
+  canvas.parent('canvas-here');
   background(255);
   frameRate(60);
+  setupTimer();
   moveCounter  = new Counter;
   squareSize = width/16;
   wallThickness = squareSize / 9;
@@ -563,6 +571,21 @@ function setup() {
   currentRobot = robots[1];
   noMove = true;
   startGame();
+}
+function setupTimer() {
+  turnTimer = new Timer;
+  let timerButton = document.getElementById('timer-button');
+  timerButton.addEventListener('click', () => {
+    if(!turnTimer.running) {
+      turnTimer.start();
+      timerButton.innerText = `Reset`
+      return;
+    }
+    else {
+      turnTimer.reset();
+      timerButton.innerText = `Start`
+    }
+  })
 }
 function draw() {
   clear();
@@ -604,7 +627,6 @@ function askForPlayers() {
   let players;
   while (isNaN(numPlayers) || numPlayers < 1 ) {
     input = prompt("How many players?");
-    console.log(input);
     if (input === null) {
       cancelled = true;
       break;
@@ -674,6 +696,7 @@ function startTurn() {
     robot.lastX = robot.x;
     robot.lastY = robot.y;
   });
+  turnTimer.reset();
   moveCounter.reset();
   turnBest = 0;
   noMove = false;
@@ -724,4 +747,42 @@ function startGame() {
   playerList.forEach( (player) => player.reset())
   placeBots();
   startTurn();
+}
+
+class Timer {
+  constructor(duration = 60) {
+    this.running = false;
+    this.duration = duration * 1000;
+    this.banked = 0;
+    this.lastStart;
+  }
+  remaining() {
+    return max(0, this.duration - this.elapsed());
+  }
+  elapsed() {
+    return min(this.duration, this.banked + (this.running ? millis() - this.lastStart : 0));
+  }
+  start() {
+    if (!this.running) {
+      this.running = true;
+      this.lastStart = millis();
+    }
+  }
+  stop() {
+    if (this.running) {
+      this.banked = this.elapsed();
+      this.running = false;
+    }
+  }
+  reset(duration = this.duration) {
+    this.duration = duration;
+    this.banked = 0;
+    this.running = false;
+    this.lastStart = null;
+  }
+  render = pushWrap( () => {
+    textSize(32);
+    fill(0);
+    text(`${parseInt(this.remaining()/1000)}`,0,0)
+  })
 }

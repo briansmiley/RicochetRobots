@@ -428,6 +428,47 @@ function genWalls() {
   completeWalls(board.spaces);
 }
 
+function createBigBoard(sections) {
+  let pieces = shuffleBoards(sections);
+  let oriented = pieces.map((board,i) => rotateBoard(board, i));
+  return joinBoards(oriented)
+}
+function shuffleBoards(doubleBoards) {
+  let boards = doubleBoards.map( (b) => random() > .5 ? b[0] : b[1])
+  //Fisher-Yates shuffle the boards
+  for (let i = boards.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [boards[i], boards[j]] = [boards[j], boards[i]];
+  }
+  return boards;
+}
+//rotates a board clockwise n * 90 degrees
+function rotateBoard(b, n) {
+  if(n == 0) return b;
+  const numCols = b[0].length;
+  const numRows = b.length;
+  let buffBoard = b.map( (row) => row.slice());
+  const rotBoard = b.map(row => new Array(row.length));
+
+  for (let i = 0; i < n; i++) {
+    for (let col = 0; col < numCols; col++) {
+      for (let row = 0; row < numRows; row++) {
+        rotBoard[row][col] = buffBoard[numRows - col - 1][row]
+        let space = rotBoard[row][col];
+        let temp = [space.northWall, space.eastWall, space.southWall, space.westWall];
+        [space.northWall, space.eastWall, space.southWall, space.westWall] = [temp[3], temp[0], temp[1], temp[2]]
+      }
+    }
+    buffBoard = rotBoard.map((row) => row.slice());
+  }
+  return rotBoard;
+}
+function joinBoards ([b1, b2, b3, b4]) {
+  const joinH = (a, b) => a.map( (row, r) => row.concat(b[r]));
+  return joinH(b1,b2).concat(joinH(b3,b4));
+}
+
+
 function genSprites(spriteData) {
 
   const makeShape = ({x, y, color, ShapeClass}) => new ShapeClass(x, y, color);

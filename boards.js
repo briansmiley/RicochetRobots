@@ -1,3 +1,14 @@
+let boardCode = genBoardCode();
+
+function genBoardCode() {
+    const flips = Array.from( {length : 4}, () => [0,1][Math.floor(Math.random() + .5)])
+    const order = [0, 1, 2, 3];
+    for (let i = order.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [order[i], order[j]] = [order[j], order[i]];
+    }
+    return flips.concat(order);
+}
 class Space {
     constructor(x,y) {
       this.x = x;
@@ -44,8 +55,8 @@ class Space {
           this.westWall = true;
           return this;
       }
-    }
-  }
+    }   
+}
 function initBoard() {
     const newBoard = (boardSize = 8) => Array.from( {length : 2}, () => 
         Array.from( {length : boardSize}, (_, r) => 
@@ -82,18 +93,14 @@ function initBoard() {
         return spaces;
     }
     function createBigBoard(doubleBoards) {
-        let pieces = shuffleBoards(doubleBoards);
+        let pieces = shuffleBoards(doubleBoards, boardCode);
         let oriented = pieces.map((board,i) => rotateBoard(board, i));
         return joinBoards(oriented)
     }
-    function shuffleBoards(doubleBoards) {
-    let boards = doubleBoards.map( (b) => random() > .5 ? b[0] : b[1])
-    //Fisher-Yates shuffle the boards
-    for (let i = boards.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [boards[i], boards[j]] = [boards[j], boards[i]];
-    }
-    return boards;
+    function shuffleBoards(doubleBoards, boardCode) {
+        const flipped = doubleBoards.map( (db, i) => db[boardCode[i]])
+        const ordered = boardCode.slice(4).map( (n) => flipped[n]);
+        return ordered;
     }
     //rotates a board clockwise n * 90 degrees
     function rotateBoard(b, n) {

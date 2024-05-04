@@ -1,4 +1,5 @@
-html, body {
+html,
+body {
   margin: 0;
   padding: 0;
 }
@@ -21,7 +22,7 @@ main {
 }
 #under-canvas {
   display: flex;
-  margin-top: .5em;
+  margin-top: 0.5em;
   justify-content: space-between;
 }
 #under-canvas > * {
@@ -30,7 +31,7 @@ main {
 #players {
   display: flex;
   flex-flow: column wrap;
-  align-items:center;
+  align-items: center;
   height: 100px;
   min-width: 250px;
   flex: 9;
@@ -41,23 +42,23 @@ main {
   justify-content: flex-end;
   align-items: flex-start;
 }
-#overlay{
+#overlay {
   display: none;
   justify-content: center;
   align-items: center;
-  position:absolute;
-  top:0;
-  left:0;
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
 }
 .score-button {
-  margin-right: .5em;
+  margin-right: 0.5em;
 }
 .player {
   display: flex;
   justify-content: center;
-  margin: .2em;
+  margin: 0.2em;
   min-height: 22px;
 }
 .hidden {

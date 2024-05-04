@@ -153,20 +153,14 @@ class Robot {
   }
 }
 class Board {
-  constructor(w, h, squareSize) {
+  constructor(spacesArray) {
     this.origX = 0;
     this.origY = 0;
-    this.w = w;
-    this.h = h;
+    this.w = spacesArray[0].length;
+    this.h = spacesArray.length;
     this.wallThickness = wallThickness;
     this.squareSize = squareSize;
-    this.spaces = new Array(h);
-    for (let i = 0; i < h; i++) {
-      this.spaces[i] = new Array(w);
-      for (let j = 0; j < w; j++) {
-        this.spaces[i][j] = new Space(j,i);
-      }
-    }
+    this.spaces = spacesArray;
   }
   locate(x,y) {
     this.origX = x;
@@ -293,186 +287,15 @@ class Board {
     return onTarget(robots.find( (robot) => robot.colorName == currentToken.colorName));
   }
 }
-class Space {
-  constructor(x,y) {
-    this.x = x;
-    this.y = y;
-    this.northWall = false;
-    this.eastWall = false;
-    this.southWall = false;
-    this.westWall = false;
-  }
-  renderWalls = pushWrap((size, wallThickness) => {
-    translate(this.x * size, this.y * size);
-    strokeWeight(wallThickness);
-    stroke(0);
-    if (this.northWall) {
-      line(0,0,size,0);
-    }
-    if (this.southWall) {
-      line(0,size,size,size);
-    }
-    if (this.eastWall) {
-      line(size,0,size,size);
-    }
-    if (this.westWall) {
-      line(0,0,0,size);
-    }
-  })
-  addWall(dir) {
-    switch (dir) {
-      case 'n':
-        this.northWall = true;
-        break;
-      case 'e':
-        this.eastWall = true;
-        break;
-      case 's':
-        this.southWall = true;
-        break;
-      case 'w':
-        this.westWall = true;
-        break;
-    }
-  }
-  
-}
 
-
-function completeWalls(spaces) {
-  spaces.forEach( (row, r) => {
-    row.forEach( (space, c) => {
-      if (r > 0 && spaces[r - 1][c].southWall) space.addWall('n');
-      if (r < spaces.length - 1 && spaces[r + 1][c].northWall) space.addWall('s');
-      if (c > 0 && spaces[r][c - 1].eastWall) space.addWall('w');
-      if (c < row.length - 1 && spaces[r][c + 1].westWall) space.addWall('e');
+function fetchSprites(board) {
+  let sprites = [];
+  board.spaces.forEach( (row) => {
+    row.forEach( (space) => {
+      if(space.sprite) sprites.push(space.sprite);
     })
-  })
-}
-
-function genWalls() {
-  //Add the edges
-  for (let i = 0; i < board.spaces.length; i++) {
-    for (let j = 0; j < board.spaces[i].length; j++) {
-      if (i == 0) board.spaces[i][j].addWall('n');
-      if (j == 0) board.spaces[i][j].addWall('w');
-      if (i == board.spaces.length - 1) board.spaces[i][j].addWall('s');
-      if (j == board.spaces[i].length - 1) board.spaces[i][j].addWall('e');
-    }
-  }
-  board.spaces[2][1].addWall('n');
-  board.spaces[2][1].addWall('w');
-  board.spaces[0][4].addWall('e');
-  board.spaces[1][6].addWall('e');
-  board.spaces[1][6].addWall('s');
-  board.spaces[5][6].addWall('n');
-  board.spaces[5][6].addWall('e');
-  board.spaces[5][0].addWall('s');
-  board.spaces[6][3].addWall('s');
-  board.spaces[6][3].addWall('w');
-  board.spaces[1][9].addWall('w');
-  board.spaces[1][9].addWall('s');
-  
-  board.spaces[7][7].addWall('w');
-  board.spaces[7][7].addWall('n');
-  board.spaces[8][7].addWall('w');
-  board.spaces[8][7].addWall('s');
-  board.spaces[8][8].addWall('s');
-  board.spaces[8][8].addWall('e');
-  board.spaces[7][8].addWall('e');
-  board.spaces[7][8].addWall('n');
-  
-  board.spaces[0][10].addWall('e');
-  board.spaces[2][14].addWall('n');
-  board.spaces[2][14].addWall('e');
-  board.spaces[4][15].addWall('s');
-  board.spaces[4][10].addWall('e');
-  board.spaces[4][10].addWall('s');
-  
-  board.spaces[6][12].addWall('w');
-  board.spaces[6][12].addWall('n');
-  
-  board.spaces[9][4].addWall('s');
-  board.spaces[9][4].addWall('w');
-  
-  board.spaces[10][6].addWall('n');
-  board.spaces[10][6].addWall('w');
-  
-  board.spaces[10][8].addWall('s');
-  board.spaces[10][8].addWall('e');
-  
-  board.spaces[13][1].addWall('n');
-  board.spaces[13][1].addWall('e');
-  
-  board.spaces[10][0].addWall('s');
-  
-  board.spaces[12][7].addWall('e');
-  board.spaces[12][7].addWall('n');
-  
-  board.spaces[14][3].addWall('s');
-  board.spaces[14][3].addWall('e');
-  
-  board.spaces[13][9].addWall('s');
-  board.spaces[13][9].addWall('w');
-  
-  board.spaces[11][13].addWall('n');
-  board.spaces[11][13].addWall('w');
-  
-  board.spaces[10][15].addWall('n');
-  
-  board.spaces[14][14].addWall('n');
-  board.spaces[14][14].addWall('e');
-  
-  board.spaces[15][4].addWall('e');
-  board.spaces[15][11].addWall('e');
-  completeWalls(board.spaces);
-}
-
-function createBigBoard(sections) {
-  let pieces = shuffleBoards(sections);
-  let oriented = pieces.map((board,i) => rotateBoard(board, i));
-  return joinBoards(oriented)
-}
-function shuffleBoards(doubleBoards) {
-  let boards = doubleBoards.map( (b) => random() > .5 ? b[0] : b[1])
-  //Fisher-Yates shuffle the boards
-  for (let i = boards.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [boards[i], boards[j]] = [boards[j], boards[i]];
-  }
-  return boards;
-}
-//rotates a board clockwise n * 90 degrees
-function rotateBoard(b, n) {
-  if(n == 0) return b;
-  const numCols = b[0].length;
-  const numRows = b.length;
-  let buffBoard = b.map( (row) => row.slice());
-  const rotBoard = b.map(row => new Array(row.length));
-
-  for (let i = 0; i < n; i++) {
-    for (let col = 0; col < numCols; col++) {
-      for (let row = 0; row < numRows; row++) {
-        rotBoard[row][col] = buffBoard[numRows - col - 1][row]
-        let space = rotBoard[row][col];
-        let temp = [space.northWall, space.eastWall, space.southWall, space.westWall];
-        [space.northWall, space.eastWall, space.southWall, space.westWall] = [temp[3], temp[0], temp[1], temp[2]]
-      }
-    }
-    buffBoard = rotBoard.map((row) => row.slice());
-  }
-  return rotBoard;
-}
-function joinBoards ([b1, b2, b3, b4]) {
-  const joinH = (a, b) => a.map( (row, r) => row.concat(b[r]));
-  return joinH(b1,b2).concat(joinH(b3,b4));
-}
-
-
-function genSprites(spriteData) {
-
-  const makeShape = ({x, y, color, ShapeClass}) => new ShapeClass(x, y, color);
-  return spriteData.map((sprite) => makeShape(sprite))
+  });
+  return sprites;
 }
 
 function mousePressed(){
@@ -557,25 +380,25 @@ function placeBots(){
 }
 
 //Hard coded but later might populate this using modular board configs
-spriteData = [
-  {x: 1, y: 2, ShapeClass: Triangle, color: 'green'},
-  {x: 6, y: 1, ShapeClass: Square, color: 'yellow'},
-  {x: 6, y: 5, ShapeClass: Square, color: 'blue'},
-  {x: 3, y: 6, ShapeClass: Circle, color: 'red'},
-  {x: 7, y: 12, ShapeClass: Burst, color: 'white'},
-  {x: 9, y: 1, ShapeClass: Square, color: 'green'},
-  {x: 4, y: 9, ShapeClass: Triangle, color: 'yellow'},
-  {x: 6, y: 10, ShapeClass: Circle, color: 'blue'},
-  {x: 8, y: 10, ShapeClass: Circle, color: 'yellow'},
-  {x: 10, y: 4, ShapeClass: Square, color: 'red'},
-  {x: 14, y: 2, ShapeClass: Star, color: 'yellow'},
-  {x: 12, y: 6, ShapeClass: Triangle, color: 'blue'},
-  {x: 3, y: 14, ShapeClass: Star, color: 'green'},
-  {x: 1, y: 13, ShapeClass: Star, color: 'red'},
-  {x: 9, y: 13, ShapeClass: Circle, color: 'green'},
-  {x: 13, y: 11, ShapeClass: Star, color: 'blue'},
-  {x: 14, y: 14, ShapeClass: Triangle, color: 'red'},
-]
+// spriteData = [
+//   {x: 1, y: 2, ShapeClass: Triangle, color: 'green'},
+//   {x: 6, y: 1, ShapeClass: Square, color: 'yellow'},
+//   {x: 6, y: 5, ShapeClass: Square, color: 'blue'},
+//   {x: 3, y: 6, ShapeClass: Circle, color: 'red'},
+//   {x: 7, y: 12, ShapeClass: Burst, color: 'white'},
+//   {x: 9, y: 1, ShapeClass: Square, color: 'green'},
+//   {x: 4, y: 9, ShapeClass: Triangle, color: 'yellow'},
+//   {x: 6, y: 10, ShapeClass: Circle, color: 'blue'},
+//   {x: 8, y: 10, ShapeClass: Circle, color: 'yellow'},
+//   {x: 10, y: 4, ShapeClass: Square, color: 'red'},
+//   {x: 14, y: 2, ShapeClass: Star, color: 'yellow'},
+//   {x: 12, y: 6, ShapeClass: Triangle, color: 'blue'},
+//   {x: 3, y: 14, ShapeClass: Star, color: 'green'},
+//   {x: 1, y: 13, ShapeClass: Star, color: 'red'},
+//   {x: 9, y: 13, ShapeClass: Circle, color: 'green'},
+//   {x: 13, y: 11, ShapeClass: Star, color: 'blue'},
+//   {x: 14, y: 14, ShapeClass: Triangle, color: 'red'},
+// ]
 
 //returns an uncollected sprite or returns false if there are none
 function getNextToken() {
@@ -605,10 +428,9 @@ function setup() {
   moveCounter  = new Counter;
   squareSize = width/16;
   wallThickness = squareSize / 9;
-  board = new Board(boardSize,boardSize,squareSize);
+  board = new Board((initBoard()));
   ['red', 'yellow', 'green', 'blue'].forEach( (color, i) => robots.push(new Robot(-1,-1,color, roboSounds[i])));
-  genWalls();
-  sprites = genSprites(spriteData);
+  sprites = fetchSprites(board);
   currentRobot = robots[1];
   noMove = true;
   startGame();
@@ -723,14 +545,7 @@ function initializePlayers() {
   playerList = askForPlayers();
   makePlayerDivs(playerList);
 }
-function pushWrap(fn) {
-  return (...args) => {
-    push();
-    const res = fn(...args);
-    pop();
-    return res;
-  }
-}
+
 
 function startTurn() {
   robots.forEach( (robot) => {

@@ -55,18 +55,21 @@ const [board1, board2, board3, board4] = Array.from( {length : 4}, () => newBoar
 
 const boards = [board1, board2, board3, board4];
 
-boards.forEach( (side) => 
+boards.forEach( (sides) => 
     sides.forEach( (side) =>
         side.forEach( (row, r) => 
             row.forEach( (space, c) => {
-                if (r = 0) space.addWall('n');
-                if (c = 0) space.addWall('w');
-                if (r == 7 && c == 7) {
-                    space.addWall('n');
-                    space.addWall('w');
+                    if (r = 0) space.addWall('n');
+                    if (c = 0) space.addWall('w');
+                    if (r == 7 && c == 7) {
+                        space.addWall('n');
+                        space.addWall('w');
+                    }
                 }
-            }
-                ))))
+            )
+        )
+    )
+)
 
 
 board1[0][0][3].addWall('e');

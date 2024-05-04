@@ -79,6 +79,7 @@ function initBoard() {
             if (c < row.length - 1 && spaces[r][c + 1].westWall) space.addWall('e');
           })
         })
+        return spaces;
     }
     function createBigBoard(doubleBoards) {
         let pieces = shuffleBoards(doubleBoards);
@@ -190,8 +191,5 @@ function initBoard() {
     board4[1][5][7].addWall('s').addWall('e').addSprite(Burst, 'white');
     board4[1][6][0].addWall('s');
 
-    boards.forEach( (sides) => {
-        sides.forEach( (side) => completeWalls(side));
-    })
-    return createBigBoard(boards);
+    return completeWalls(createBigBoard(boards));
 }

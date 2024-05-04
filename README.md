@@ -2,35 +2,34 @@
 
 My (very WIP) [p5.js](https://p5js.org/) implementation of the out-of-print, surprisingly fun mental-shape-translation game [Ricochet Robots](https://en.wikipedia.org/wiki/Ricochet_Robots)
 
-Try out the latest* version on [my site](https://briansmiley.github.io/p5/ricochetrobots/) or fiddle with the code in in the [p5 Editor](https://editor.p5js.org/briansmiley/sketches/LJjfo8k1P)
+Try out the latest version on [my site](https://briansmiley.github.io/p5/ricochetrobots/) or fiddle with the code\* in in the [p5 Editor](https://editor.p5js.org/briansmiley/sketches/LJjfo8k1P)
 
-**Instructions**
--
--Click to select a robot
-         
--`w` `a` `s` `d` or `↑` `←` `↓` `→` to move
+## **Instructions**
 
--Robots move until they hit a wall or another robot
+- Click to select a robot
+- `w` `a` `s` `d` or `↑` `←` `↓` `→` to move
 
--Goal is to make the matching color robot reach the target shape in as few moves as possible (rainbow shape can be reached by any color)
+- Robots move until they hit a wall or another robot
 
--`r` to reset current solution attempt
+- Goal is to make the matching color robot reach the target shape in as few moves as possible (rainbow shape can be reached by any color).
 
--Clicking center shape resets turn and selects a new token
+- For multiplayer, players find solutions in their heads without moving robots on screen. Once a player claims a solution move count, start the minute timer, during which other players can propose faster solutions. Once time is up, demonstrate the fastest valid solution on screen and collect the point for the appropriate player
 
--Click collect next to player who proposed the fastest route
+- `r` resets the current solution attempt
 
--Full original game instructions [here](https://images-cdn.zmangames.com/us-east-1/filer_public/c0/b4/c0b482f1-ad3e-4e5d-ae48-0c11aa7c317a/en-ricochet_robot-rules.pdf)
+- Clicking center shape resets the turn and selects a new token (e.g. if the current target is trivial or too challenging to reach)
 
+- Full original game instructions available [here](https://images-cdn.zmangames.com/us-east-1/filer_public/c0/b4/c0b482f1-ad3e-4e5d-ae48-0c11aa7c317a/en-ricochet_robot-rules.pdf)
 
-<span style="font-size:.75em;">*as of 4/30/24</span>
+- Board is shuffled on each page load!
+
+<span style="font-size:.75em;">\*as of 4/30/24</span>
 
 ![App screenshot](./images/gameplay.png)
-*App screenshot*
+_App screenshot_
 
 ![Box art](./images/ricochet_robots_box.png)
-*Original box art*
+_Original box art_
 
 ![Board game image](./images/ricochet_robots_real.jpeg)
-*Physical game*
-
+_Physical game_

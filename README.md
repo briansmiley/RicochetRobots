@@ -6,16 +6,19 @@ Try out the latest version on [my site](https://briansmiley.github.io/p5/ricoche
 
 ## **Instructions**
 
+- Reach the target shape with the matching color robot in as few moves as possible (the rainbow shape can be reached by any color)
+
+- For multiplayer, players find solutions in their heads without moving robots on screen. Once a player finds a solution path, they announce the number of moves it contains and start the timer. For up to one minute, other players can propose faster solutions. Once time is up, demonstrate the fastest valid solution on screen and collect the point for the appropriate player
+
+### Controls
+
 - Click to select a robot
+
 - `w` `a` `s` `d` or `↑` `←` `↓` `→` to move
 
 - Robots move until they hit a wall or another robot
 
-- Goal is to make the matching color robot reach the target shape in as few moves as possible (rainbow shape can be reached by any color).
-
-- For multiplayer, players find solutions in their heads without moving robots on screen. Once a player claims a solution move count, start the minute timer, during which other players can propose faster solutions. Once time is up, demonstrate the fastest valid solution on screen and collect the point for the appropriate player
-
-- `r` resets the current solution attempt
+- `r` resets the current solution attempt, moving robots back to their marked starting positions for the current turn
 
 - Clicking center shape resets the turn and selects a new token (e.g. if the current target is trivial or too challenging to reach)
 
@@ -23,7 +26,7 @@ Try out the latest version on [my site](https://briansmiley.github.io/p5/ricoche
 
 - Board is shuffled on each page load!
 
-<span style="font-size:.75em;">\*as of 4/30/24</span>
+<span style="font-size:.75em;">\*as of 05/04/24</span>
 
 ![App screenshot](./images/gameplay.png)
 _App screenshot_

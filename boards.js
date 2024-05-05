@@ -22,10 +22,10 @@ class Space {
     this.southWall = false;
     this.westWall = false;
   }
-  renderWalls = pushWrap((size, wallThickness) => {
+  renderWalls = pushWrap((size, wallThickness, colr) => {
     translate(this.x * size, this.y * size);
     strokeWeight(wallThickness);
-    stroke(0);
+    stroke(colr);
     if (this.northWall) {
       line(0, 0, size, 0);
     }

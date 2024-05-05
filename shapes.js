@@ -24,6 +24,11 @@ class Shape {
   renderBoard() {
     this.drawMed();
   }
+  renderMerlin = pushWrap(() => {
+    stroke(this.color);
+    point(0, 0);
+  });
+
   dim(alph) {
     this.color = setAlpha(this.color, alph);
   }

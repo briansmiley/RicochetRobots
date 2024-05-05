@@ -92,7 +92,7 @@ class Robot {
   stop() {
     this.vel = [0, 0];
     if (inMotion) {
-      click.play();
+      // click.play();
       moveCounter.increment();
     }
     inMotion = false;
@@ -173,7 +173,7 @@ class Board {
   update() {
     currentRobot.move();
     if (this.checkGoal()) {
-      if (!hitTarget) victorySound.play();
+      // if (!hitTarget) victorySound.play();
       hitTarget = true;
       updateTurnBest(moveCounter.count + 1);
       noMove = true;
@@ -429,16 +429,16 @@ function getNextToken() {
   }
 }
 
-function preload() {
-  click = loadSound("sound/click.mp3");
-  roboSounds = Array.from({ length: 4 }, (_, i) =>
-    loadSound(`./sound/interface/question_00${i + 1}.ogg`)
-  );
-  roboSounds.forEach((sound) => sound.setVolume(0.1));
-  click.setVolume(0.5);
-  victorySound = loadSound("./sound/interface/confirmation_004.ogg");
-  victorySound.setVolume(0.2);
-}
+// function preload() {
+//   click = loadSound("sound/click.mp3");
+//   roboSounds = Array.from({ length: 4 }, (_, i) =>
+//     loadSound(`./sound/interface/question_00${i + 1}.ogg`)
+//   );
+//   roboSounds.forEach((sound) => sound.setVolume(0.1));
+//   click.setVolume(0.5);
+//   victorySound = loadSound("./sound/interface/confirmation_004.ogg");
+//   victorySound.setVolume(0.2);
+// }
 function setup() {
   let w = min(windowWidth, (windowHeight - 100) / 1.2);
   let canvas = createCanvas(w, w * 1.17);
@@ -451,7 +451,7 @@ function setup() {
   wallThickness = squareSize / 9;
   board = new Board(initBoard());
   ["red", "yellow", "green", "blue"].forEach((color, i) =>
-    robots.push(new Robot(-1, -1, color, roboSounds[i]))
+    robots.push(new Robot(-1, -1, color))
   );
   sprites = fetchSprites(board);
   currentRobot = robots[1];

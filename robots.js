@@ -249,11 +249,10 @@ class Board {
           this.squareSize * (0.5 + currentSprite.y)
         );
         //Dim sprite if a robot is on top of it
-        // robots.forEach((robot) => {
-        //   if (currentSprite.x == robot.x && currentSprite.y == robot.y)
-        //     currentSprite.dim(75);
-        // });
-        if (currentSprite != currentToken) currentSprite.dim(80);
+        robots.forEach((robot) => {
+          if (currentSprite.x == robot.x && currentSprite.y == robot.y)
+            currentSprite.dim(75);
+        });
         currentSprite.renderBoard();
         currentSprite.undim();
         // currentSprite.undim();

@@ -255,6 +255,7 @@ class Board {
         });
         currentSprite.renderBoard();
         currentSprite.undim();
+        // currentSprite.undim();
       })
     );
   }
@@ -334,6 +335,7 @@ function mousePressed() {
   }
 }
 function keyPressed() {
+  if (document.activeElement.getAttribute("contenteditable") === "true") return;
   if (inMotion) return;
   switch (keyCode) {
     case UP_ARROW:
@@ -446,6 +448,8 @@ function setup() {
   background(255);
   frameRate(60);
   setupTimer();
+  addPlayer(new Player("Player1", 1));
+  setupAddPlayer();
   moveCounter = new Counter();
   squareSize = width / 16;
   wallThickness = squareSize / 9;
@@ -475,11 +479,6 @@ function setupTimer() {
 function draw() {
   clear();
   background(220);
-  // if (frameCount % 15 == 0)console.log(inMotion);
-  if (frameCount == 2 && playerList.length == 0) {
-    initializePlayers();
-    secondFrame = true;
-  }
   board.update();
   board.show();
 }
@@ -489,7 +488,8 @@ class Player {
     this.id = id;
     this.tokens = [];
     this.elt;
-    this.textSpan;
+    this.nameSpan;
+    this.scoreSpan;
     this.scoreButton;
   }
   collectToken() {
@@ -506,69 +506,78 @@ class Player {
     this.tokens = [];
   }
 }
-function askForPlayers() {
-  let numPlayers = null;
-  let cancelled = false;
-  let players;
-  while (isNaN(numPlayers) || numPlayers < 1) {
-    input = prompt("How many players?");
-    if (input === null) {
-      cancelled = true;
-      break;
-    }
-    numPlayers = parseInt(input);
-  }
-  if (cancelled) players = [new Player(`Player 1`, 0)];
-  else
-    players = Array.from(
-      { length: numPlayers },
-      (_, i) => new Player(prompt(`Player ${i + 1} name`), i)
-    );
-  return players;
+
+function setupAddPlayer() {
+  let button = document.getElementById("add-player");
+  button.onclick = () => {
+    const id = playerList[playerList.length - 1].id + 1;
+    const newPlayer = new Player(`Player${id}`, id);
+    addPlayer(newPlayer);
+    newPlayer.nameSpan.focus();
+    selectPlayerName(newPlayer);
+  };
 }
-
-function makePlayerDivs(players) {
+function selectPlayerName(player) {
+  let range = document.createRange();
+  let selection = window.getSelection();
+  selection.removeAllRanges();
+  range.selectNodeContents(player.nameSpan);
+  selection.addRange(range);
+}
+function addPlayer(player) {
+  playerList.push(player);
   const container = document.getElementById("players");
-  container.innerHTML = "";
 
-  players.forEach((player) => {
-    const playerDiv = document.createElement("div");
-    playerDiv.id = `player-${player.id}`;
-    playerDiv.className = `player`;
-    const playerNameAndScore = document.createElement("span");
-    playerNameAndScore.id = `player-${player.id}-text`;
-    playerNameAndScore.textContent = `${player.name}: ${player.tokens.length}`;
+  const playerDiv = document.createElement("div");
+  playerDiv.id = `player-${player.id}`;
+  playerDiv.className = `player`;
 
-    const scoreButton = document.createElement("button");
-    scoreButton.className = "score-button";
-    scoreButton.id = `score-player-${player.id}`;
-    scoreButton.textContent = "Collect";
-    scoreButton.onclick = () => player.collectToken();
+  const playerText = document.createElement("div");
+  playerText.id = `player-${player.id}-text`;
+  playerText.classname = `player-text`;
 
-    player.elt = playerDiv;
-    player.textSpan = playerNameAndScore;
-    player.scoreButton = scoreButton;
-    playerDiv.appendChild(scoreButton);
-    playerDiv.appendChild(playerNameAndScore);
-    container.appendChild(playerDiv);
+  const playerName = document.createElement("div");
+  playerName.textContent = `${player.name}`;
+  playerName.className = "player-name";
+  playerName.id = `player-${player.id}-name`;
+  playerName.setAttribute("contenteditable", "true");
+  playerName.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" || event.key === "Escape") {
+      event.preventDefault(); // Prevent the default behavior (adding a new line)
+      playerName.blur(); // Remove focus from the contenteditable div
+    }
   });
+
+  const playerScore = document.createElement("div");
+  playerScore.className = "player-score";
+  playerScore.textContent = "0";
+
+  const scoreButton = document.createElement("button");
+  scoreButton.className = "score-button";
+  scoreButton.id = `score-player-${player.id}`;
+  scoreButton.textContent = "Collect";
+  scoreButton.onclick = () => player.collectToken();
+
+  player.elt = playerDiv;
+  player.scoreSpan = playerScore;
+  player.scoreButton = scoreButton;
+  player.nameSpan = playerName;
+  playerDiv.appendChild(scoreButton);
+  playerDiv.appendChild(playerName);
+  playerDiv.appendChild(document.createTextNode(": "));
+  playerDiv.appendChild(playerScore);
+  container.insertBefore(playerDiv, container.lastElementChild);
 }
 
 function updatePlayers() {
   if (playerList.length == 0) return;
-  if (turnBest == 0) {
-  }
   playerList.forEach((player) => {
-    player.textSpan.textContent = `${player.name}: ${player.tokens.length}`;
+    player.scoreSpan.textContent = `${player.tokens.length}`;
     //If the goal hasnt been reached yet, hide the Collect buttons
     turnBest == 0
       ? player.scoreButton.classList.add("hidden")
       : player.scoreButton.classList.remove("hidden");
   });
-}
-function initializePlayers() {
-  playerList = askForPlayers();
-  makePlayerDivs(playerList);
 }
 
 function startTurn() {

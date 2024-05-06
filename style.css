@@ -58,8 +58,12 @@ main {
 .player {
   display: flex;
   justify-content: center;
+  align-items: center;
   margin: 0.2em;
   min-height: 22px;
+}
+.player-score {
+  margin-left: 5px;
 }
 .hidden {
   display: none;

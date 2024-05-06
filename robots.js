@@ -508,10 +508,10 @@ class Player {
 }
 
 function setupAddPlayer() {
-  let button = document.getElementById("add-player");
+  let button = document.getElementById("add-player-button");
   button.onclick = () => {
     const id = playerList[playerList.length - 1].id + 1;
-    const newPlayer = new Player(`Player${id}`, id);
+    const newPlayer = new Player(`Player ${id}`, id);
     addPlayer(newPlayer);
     newPlayer.nameSpan.focus();
     selectPlayerName(newPlayer);
@@ -567,6 +567,9 @@ function addPlayer(player) {
   playerDiv.appendChild(document.createTextNode(": "));
   playerDiv.appendChild(playerScore);
   container.insertBefore(playerDiv, container.lastElementChild);
+
+  if (playerList.length > 17)
+    document.getElementById("add-player-button").classList.add("hidden");
 }
 
 function updatePlayers() {

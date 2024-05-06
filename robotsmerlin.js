@@ -454,7 +454,7 @@ function setup() {
   //   let canvas = createCanvas(w, w * 1.17);
   let canvas = createCanvas(44, 66);
   //   canvas.parent("canvas-here");
-  background(255);
+  background(0);
   //   frameRate(60);
   //   setupTimer();
   //   moveCounter = new Counter();
@@ -464,7 +464,7 @@ function setup() {
   wallThickness = 1;
   board = new Board(initBoard());
   ["red", "yellow", "green", "blue"].forEach((color, i) =>
-    robots.push(new Robot(-1, -1, color, roboSounds[i]))
+    robots.push(new Robot(-1, -1, color))
   );
   sprites = fetchSprites(board);
   currentRobot = robots[1];
@@ -486,8 +486,7 @@ function setupTimer() {
   });
 }
 function draw() {
-  clear();
-  background(220);
+  background(0);
   // if (frameCount % 15 == 0)console.log(inMotion);
   if (frameCount == 2 && playerList.length == 0) {
     // initializePlayers();

@@ -513,8 +513,6 @@ function setupAddPlayer() {
     const id = playerList[playerList.length - 1].id + 1;
     const newPlayer = new Player(`Player ${id}`, id);
     addPlayer(newPlayer);
-    newPlayer.nameSpan.focus();
-    selectPlayerName(newPlayer);
   };
 }
 function selectPlayerName(player) {
@@ -568,7 +566,13 @@ function addPlayer(player) {
   playerDiv.appendChild(playerScore);
   container.insertBefore(playerDiv, container.lastElementChild);
 
+  if (player.id != 1) {
+    //skip focus/selecting if this is the first player
+    player.nameSpan.focus();
+    selectPlayerName(player);
+  }
   if (playerList.length > 17)
+    //we have to stop somewhere
     document.getElementById("add-player-button").classList.add("hidden");
 }
 

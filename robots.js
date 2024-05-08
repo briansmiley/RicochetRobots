@@ -448,8 +448,12 @@ function setup() {
   background(255);
   frameRate(60);
   setupTimer();
-  addPlayer(new Player("Player 1", 1));
+
+  const p1 = new Player("Player 1", 1);
+  addPlayer(p1);
+  // p1.elt.replaceChild(p1.input, p1.nameSpan);
   setupAddPlayer();
+
   moveCounter = new Counter();
   squareSize = width / 16;
   wallThickness = squareSize / 9;
@@ -490,7 +494,7 @@ class Player {
     this.elt;
     this.nameSpan;
     this.scoreSpan;
-    this.input;
+    this.nameInput;
     this.scoreButton;
   }
   collectToken() {
@@ -559,8 +563,8 @@ function addPlayer(player) {
   });
   const editName = () => {
     playerDiv.replaceChild(playerInput, playerName); // Replace name with editable input
-    player.input.focus(); //Select the input
-    player.input.select();
+    player.nameInput.focus(); //Select the input
+    player.nameInput.select();
   };
   playerName.addEventListener("click", editName);
 
@@ -578,15 +582,17 @@ function addPlayer(player) {
   player.scoreSpan = playerScore;
   player.scoreButton = scoreButton;
   player.nameSpan = playerName;
-  player.input = playerInput;
+  player.nameInput = playerInput;
   playerDiv.appendChild(scoreButton);
   playerDiv.appendChild(playerInput);
   playerDiv.appendChild(document.createTextNode(": "));
   playerDiv.appendChild(playerScore);
   container.insertBefore(playerDiv, container.lastElementChild);
 
-  player.input.focus();
-  player.input.select();
+  if (player.id != 1) {
+    player.nameInput.focus();
+    player.nameInput.select();
+  }
   if (playerList.length > 17)
     //we have to stop somewhere
     document.getElementById("add-player-button").classList.add("hidden");

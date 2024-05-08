@@ -553,7 +553,7 @@ function addPlayer(player) {
   };
   playerInput.addEventListener("blur", updateName);
   playerInput.addEventListener("keydown", (event) => {
-    if (event.key === "Enter") {
+    if (event.key === "Escape") {
       updateName();
     }
   });

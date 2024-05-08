@@ -335,7 +335,7 @@ function mousePressed() {
   }
 }
 function keyPressed() {
-  if (document.activeElement.tagName == "INPUT") return;
+  if (document.activeElement.tagName == "INPUT") return; //ignore keyboard inputs if we are editing a player name
   if (inMotion) return;
   switch (keyCode) {
     case UP_ARROW:

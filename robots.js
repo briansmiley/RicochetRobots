@@ -335,7 +335,7 @@ function mousePressed() {
   }
 }
 function keyPressed() {
-  if (document.activeElement.getAttribute("contenteditable") === "true") return;
+  if (document.activeElement.tagName == "INPUT") return; //ignore keyboard inputs if we are editing a player name
   if (inMotion) return;
   switch (keyCode) {
     case UP_ARROW:
@@ -448,7 +448,7 @@ function setup() {
   background(255);
   frameRate(60);
   setupTimer();
-  addPlayer(new Player("Player1", 1));
+  addPlayer(new Player("Player 1", 1));
   setupAddPlayer();
   moveCounter = new Counter();
   squareSize = width / 16;
@@ -490,6 +490,7 @@ class Player {
     this.elt;
     this.nameSpan;
     this.scoreSpan;
+    this.input;
     this.scoreButton;
   }
   collectToken() {
@@ -513,15 +514,14 @@ function setupAddPlayer() {
     const id = playerList[playerList.length - 1].id + 1;
     const newPlayer = new Player(`Player ${id}`, id);
     addPlayer(newPlayer);
-    newPlayer.nameSpan.focus();
-    selectPlayerName(newPlayer);
   };
 }
 function selectPlayerName(player) {
+  //For selecting the name div in the contenteditable implementation
   let range = document.createRange();
   let selection = window.getSelection();
   selection.removeAllRanges();
-  range.selectNodeContents(player.nameSpan);
+  range.selectNodeContents(player.input);
   selection.addRange(range);
 }
 function addPlayer(player) {
@@ -536,17 +536,33 @@ function addPlayer(player) {
   playerText.id = `player-${player.id}-text`;
   playerText.classname = `player-text`;
 
+  //create player name field
   const playerName = document.createElement("div");
   playerName.textContent = `${player.name}`;
   playerName.className = "player-name";
   playerName.id = `player-${player.id}-name`;
-  playerName.setAttribute("contenteditable", "true");
-  playerName.addEventListener("keydown", (event) => {
-    if (event.key === "Enter" || event.key === "Escape") {
-      event.preventDefault(); // Prevent the default behavior (adding a new line)
-      playerName.blur(); // Remove focus from the contenteditable div
+
+  const playerInput = document.createElement("input");
+  playerInput.type = "text";
+  playerInput.className = "player-name-input";
+  playerInput.value = player.name;
+  const updateName = () => {
+    player.name = playerInput.value || player.name;
+    playerName.textContent = player.name; //set playerName text to input text
+    playerDiv.replaceChild(playerName, playerInput); // Replace the input with the text
+  };
+  playerInput.addEventListener("blur", updateName);
+  playerInput.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      updateName();
     }
   });
+  const editName = () => {
+    playerDiv.replaceChild(playerInput, playerName); // Replace name with editable input
+    player.input.focus(); //Select the input
+    player.input.select();
+  };
+  playerName.addEventListener("click", editName);
 
   const playerScore = document.createElement("div");
   playerScore.className = "player-score";
@@ -562,13 +578,17 @@ function addPlayer(player) {
   player.scoreSpan = playerScore;
   player.scoreButton = scoreButton;
   player.nameSpan = playerName;
+  player.input = playerInput;
   playerDiv.appendChild(scoreButton);
-  playerDiv.appendChild(playerName);
+  playerDiv.appendChild(playerInput);
   playerDiv.appendChild(document.createTextNode(": "));
   playerDiv.appendChild(playerScore);
   container.insertBefore(playerDiv, container.lastElementChild);
 
+  player.input.focus();
+  player.input.select();
   if (playerList.length > 17)
+    //we have to stop somewhere
     document.getElementById("add-player-button").classList.add("hidden");
 }
 

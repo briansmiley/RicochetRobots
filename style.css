@@ -3,6 +3,7 @@ body {
   margin: 0;
   padding: 0;
   font-family: Arial, Helvetica, sans-serif;
+  font-size: 12pt;
 }
 canvas {
   display: block;
@@ -65,6 +66,10 @@ main {
 }
 .player-score {
   margin-left: 5px;
+}
+.player-name-input {
+  font-size: 12pt;
+  width: 5em;
 }
 .hidden {
   display: none;

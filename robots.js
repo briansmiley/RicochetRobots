@@ -650,8 +650,6 @@ function startTurn() {
   robots.forEach((robot) => {
     robot.lastX = robot.x;
     robot.lastY = robot.y;
-    robot.lastStopX = robot.x;
-    robot.lastStopY = robot.y;
   });
   board.resetHistory();
   turnTimer.reset();
@@ -664,7 +662,7 @@ function resetTurn() {
     robot.x = robot.lastX;
     robot.y = robot.lastY;
   });
-  board.resetHistory;
+  board.resetHistory();
   moveCounter.reset();
   noMove = false;
 }

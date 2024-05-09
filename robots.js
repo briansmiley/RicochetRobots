@@ -352,7 +352,7 @@ function keyPressed() {
       break;
     default:
       switch (key) {
-        case "r":
+        case " ":
           resetTurn();
           break;
         case "w":
@@ -367,6 +367,11 @@ function keyPressed() {
         case "d":
           currentRobot.vel = [1, 0];
           break;
+        case "r":
+        case "g":
+        case "b":
+        case "y":
+          currentRobot = robots.find((robot) => robot.colorName[0] == key);
       }
   }
 }

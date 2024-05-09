@@ -12,13 +12,13 @@ Try out the latest version on [my site](https://briansmiley.github.io/p5/ricoche
 
 ### Controls
 
-- Click to select a robot
+- Click or press `r` `g` `b` and `y` to select the red/green/blue/yellow robot
 
 - `w` `a` `s` `d` or `↑` `←` `↓` `→` to move
 
 - Robots move until they hit a wall or another robot
 
-- `r` resets the current solution attempt, moving robots back to their marked starting positions for the current turn
+- `spacebar` resets the current solution attempt, moving robots back to their marked starting positions for the current turn
 
 - Clicking center shape resets the turn and selects a new token (e.g. if the current target is trivial or too challenging to reach)
 

@@ -52,6 +52,8 @@ class Robot {
     this.y = y;
     this.lastX = x;
     this.lastY = y;
+    this.lastStopX = -1;
+    this.lastStopY = -1;
     this.color = color(colr);
     this.colorName = colr;
     this.vel = [0, 0];
@@ -92,6 +94,13 @@ class Robot {
   stop() {
     this.vel = [0, 0];
     if (inMotion) {
+      board.history.push({
+        colorName: this.colorName,
+        x: this.lastStopX,
+        y: this.lastStopY,
+      });
+      this.lastStopX = this.x;
+      this.lastStopY = this.y;
       click.play();
       moveCounter.increment();
     }
@@ -165,6 +174,7 @@ class Board {
     this.wallThickness = wallThickness;
     this.squareSize = squareSize;
     this.spaces = spacesArray;
+    this.history = [];
   }
   locate(x, y) {
     this.origX = x;
@@ -179,7 +189,25 @@ class Board {
       noMove = true;
     } else hitTarget = false;
   }
-
+  rewind(n) {
+    if (this.history.length == 0) {
+      robots.forEach((robot) => robot.place(robot.lastX, robot.lastY));
+      return;
+    }
+    for (let i = 0; i < n; i++) {
+      let step = this.history.pop();
+      robots
+        .find((robot) => robot.colorName == step.colorName)
+        .place(step.x, step.y);
+      moveCounter.increment(-1);
+    }
+  }
+  resetHistory() {
+    this.history = [];
+    robots.forEach(
+      (robot) => ([robot.lastStopX, robot.lastStopY] = [robot.x, robot.y])
+    );
+  }
   show = pushWrap(() => {
     translate(this.origX, this.origY);
     this.renderGrid();
@@ -350,9 +378,12 @@ function keyPressed() {
     case RIGHT_ARROW:
       currentRobot.vel = [1, 0];
       break;
+    case BACKSPACE:
+      board.rewind(1);
+      break;
     default:
       switch (key) {
-        case "r":
+        case " ":
           resetTurn();
           break;
         case "w":
@@ -366,6 +397,12 @@ function keyPressed() {
           break;
         case "d":
           currentRobot.vel = [1, 0];
+          break;
+        case "r":
+        case "g":
+        case "b":
+        case "y":
+          currentRobot = robots.find((robot) => robot.colorName[0] == key);
           break;
       }
   }
@@ -614,6 +651,7 @@ function startTurn() {
     robot.lastX = robot.x;
     robot.lastY = robot.y;
   });
+  board.resetHistory();
   turnTimer.reset();
   moveCounter.reset();
   turnBest = 0;
@@ -624,6 +662,7 @@ function resetTurn() {
     robot.x = robot.lastX;
     robot.y = robot.lastY;
   });
+  board.resetHistory();
   moveCounter.reset();
   noMove = false;
 }

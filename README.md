@@ -18,7 +18,7 @@ Try out the latest version on [my site](https://briansmiley.github.io/p5/ricoche
 
 - Robots move until they hit a wall or another robot
 
-- `spacebar` resets the current solution attempt, moving robots back to their marked starting positions for the current turn
+- `Backspace` undoes move recent move, `Spacebar` resets the current solution attempt, moving robots back to their marked starting positions
 
 - Clicking center shape resets the turn and selects a new token (e.g. if the current target is trivial or too challenging to reach)
 

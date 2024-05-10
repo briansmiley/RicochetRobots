@@ -175,6 +175,7 @@ class Board {
     this.squareSize = squareSize;
     this.spaces = spacesArray;
     this.history = [];
+    this.endSpots = {};
   }
   locate(x, y) {
     this.origX = x;
@@ -183,11 +184,19 @@ class Board {
   update() {
     currentRobot.move();
     if (this.checkGoal()) {
-      if (!hitTarget) victorySound.play();
+      if (!hitTarget) {
+        victorySound.play();
+        if (moveCounter.count < turnBest || turnBest == 0) this.saveEndSpots();
+      }
       hitTarget = true;
       updateTurnBest(moveCounter.count + 1);
       noMove = true;
     } else hitTarget = false;
+  }
+  saveEndSpots() {
+    robots.forEach(
+      (robot) => (this.endSpots[robot.colorName] = [robot.x, robot.y])
+    );
   }
   rewind(n) {
     if (this.history.length == 0) {
@@ -196,9 +205,10 @@ class Board {
     }
     for (let i = 0; i < n; i++) {
       let step = this.history.pop();
-      robots
-        .find((robot) => robot.colorName == step.colorName)
-        .place(step.x, step.y);
+      let rob = robots.find((robot) => robot.colorName == step.colorName);
+      rob.place(step.x, step.y);
+      rob.lastStopX = step.x;
+      rob.lastStopY = step.y;
       moveCounter.increment(-1);
     }
   }
@@ -360,6 +370,7 @@ function mousePressed() {
     if (!currentToken) gameOver = true;
     turnBest = 0;
     resetTurn();
+    startTurn();
   }
 }
 function keyPressed() {
@@ -542,6 +553,10 @@ class Player {
     this.tokens.push(currentToken);
     collectedTokens.push(currentToken);
     currentToken = getNextToken();
+    robots.forEach((robot) => {
+      const endPos = board.endSpots[robot.colorName];
+      robot.place(endPos[0], endPos[1]);
+    });
     startTurn();
   }
   reset() {
@@ -652,6 +667,7 @@ function startTurn() {
     robot.lastY = robot.y;
   });
   board.resetHistory();
+  board.saveEndSpots();
   turnTimer.reset();
   moveCounter.reset();
   turnBest = 0;

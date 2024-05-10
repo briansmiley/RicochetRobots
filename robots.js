@@ -646,7 +646,7 @@ function addPlayer(player) {
     player.nameInput.focus();
     player.nameInput.select();
   }
-  if (playerList.length > 17)
+  if (playerList.length > 11)
     //we have to stop somewhere
     document.getElementById("add-player-button").classList.add("hidden");
 }

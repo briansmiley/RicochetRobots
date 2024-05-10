@@ -43,6 +43,7 @@ main {
   display: flex;
   justify-content: flex-end;
   align-items: flex-start;
+  width: 22px;
 }
 #overlay {
   display: none;

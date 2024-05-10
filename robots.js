@@ -175,6 +175,7 @@ class Board {
     this.squareSize = squareSize;
     this.spaces = spacesArray;
     this.history = [];
+    this.endSpots = {};
   }
   locate(x, y) {
     this.origX = x;
@@ -183,11 +184,19 @@ class Board {
   update() {
     currentRobot.move();
     if (this.checkGoal()) {
-      if (!hitTarget) victorySound.play();
+      if (!hitTarget) {
+        victorySound.play();
+        if (moveCounter.count < turnBest || turnBest == 0) this.saveEndSpots();
+      }
       hitTarget = true;
       updateTurnBest(moveCounter.count + 1);
       noMove = true;
     } else hitTarget = false;
+  }
+  saveEndSpots() {
+    robots.forEach(
+      (robot) => (this.endSpots[robot.colorName] = [robot.x, robot.y])
+    );
   }
   rewind(n) {
     if (this.history.length == 0) {
@@ -196,9 +205,10 @@ class Board {
     }
     for (let i = 0; i < n; i++) {
       let step = this.history.pop();
-      robots
-        .find((robot) => robot.colorName == step.colorName)
-        .place(step.x, step.y);
+      let rob = robots.find((robot) => robot.colorName == step.colorName);
+      rob.place(step.x, step.y);
+      rob.lastStopX = step.x;
+      rob.lastStopY = step.y;
       moveCounter.increment(-1);
     }
   }
@@ -360,6 +370,7 @@ function mousePressed() {
     if (!currentToken) gameOver = true;
     turnBest = 0;
     resetTurn();
+    startTurn();
   }
 }
 function keyPressed() {
@@ -485,7 +496,9 @@ function setup() {
   background(255);
   frameRate(60);
   setupTimer();
-
+  window.addEventListener("keydown", (event) => {
+    if (event.key == " ") event.preventDefault();
+  });
   const p1 = new Player("Player 1", 1);
   addPlayer(p1);
   // p1.elt.replaceChild(p1.input, p1.nameSpan);
@@ -509,13 +522,12 @@ function setupTimer() {
   timerButton.addEventListener("click", () => {
     if (!turnTimer.running) {
       turnTimer.start();
-      timerButton.innerText = `Reset`;
       return;
     } else {
       turnTimer.reset();
-      timerButton.innerText = `Start`;
     }
   });
+  turnTimer.button = timerButton;
 }
 function draw() {
   clear();
@@ -542,6 +554,10 @@ class Player {
     this.tokens.push(currentToken);
     collectedTokens.push(currentToken);
     currentToken = getNextToken();
+    robots.forEach((robot) => {
+      const endPos = board.endSpots[robot.colorName];
+      robot.place(endPos[0], endPos[1]);
+    });
     startTurn();
   }
   reset() {
@@ -652,6 +668,7 @@ function startTurn() {
     robot.lastY = robot.y;
   });
   board.resetHistory();
+  board.saveEndSpots();
   turnTimer.reset();
   moveCounter.reset();
   turnBest = 0;
@@ -712,6 +729,7 @@ class Timer {
     this.duration = duration * 1000;
     this.banked = 0;
     this.lastStart;
+    this.button;
   }
   remaining() {
     return max(0, this.duration - this.elapsed());
@@ -725,6 +743,7 @@ class Timer {
   start() {
     if (!this.running) {
       this.running = true;
+      this.button.innerText = "Reset";
       this.lastStart = millis();
     }
   }
@@ -732,6 +751,7 @@ class Timer {
     if (this.running) {
       this.banked = this.elapsed();
       this.running = false;
+      this.button.innerText = "Start";
     }
   }
   reset(duration = this.duration) {
@@ -739,6 +759,7 @@ class Timer {
     this.banked = 0;
     this.running = false;
     this.lastStart = null;
+    this.button.innerText = "Start";
   }
   render = pushWrap(() => {
     textSize(32);

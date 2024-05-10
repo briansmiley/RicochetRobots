@@ -496,7 +496,9 @@ function setup() {
   background(255);
   frameRate(60);
   setupTimer();
-
+  window.addEventListener("keydown", (event) => {
+    if (event.key == " ") event.preventDefault();
+  });
   const p1 = new Player("Player 1", 1);
   addPlayer(p1);
   // p1.elt.replaceChild(p1.input, p1.nameSpan);
@@ -520,13 +522,12 @@ function setupTimer() {
   timerButton.addEventListener("click", () => {
     if (!turnTimer.running) {
       turnTimer.start();
-      timerButton.innerText = `Reset`;
       return;
     } else {
       turnTimer.reset();
-      timerButton.innerText = `Start`;
     }
   });
+  turnTimer.button = timerButton;
 }
 function draw() {
   clear();
@@ -728,6 +729,7 @@ class Timer {
     this.duration = duration * 1000;
     this.banked = 0;
     this.lastStart;
+    this.button;
   }
   remaining() {
     return max(0, this.duration - this.elapsed());
@@ -741,6 +743,7 @@ class Timer {
   start() {
     if (!this.running) {
       this.running = true;
+      this.button.innerText = "Reset";
       this.lastStart = millis();
     }
   }
@@ -748,6 +751,7 @@ class Timer {
     if (this.running) {
       this.banked = this.elapsed();
       this.running = false;
+      this.button.innerText = "Start";
     }
   }
   reset(duration = this.duration) {
@@ -755,6 +759,7 @@ class Timer {
     this.banked = 0;
     this.running = false;
     this.lastStart = null;
+    this.button.innerText = "Start";
   }
   render = pushWrap(() => {
     textSize(32);

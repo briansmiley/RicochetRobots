@@ -570,6 +570,9 @@ function setupAddPlayer() {
   button.onclick = () => {
     const id = playerList[playerList.length - 1].id + 1;
     const newPlayer = new Player(`Player ${id}`, id);
+    if (playerList.length == 1) {
+      playerList[0].nameInput.focus(); //So the previous name input goes away (really only applies to P1)
+    }
     addPlayer(newPlayer);
   };
 }

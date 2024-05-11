@@ -391,6 +391,7 @@ function keyPressed() {
       break;
     case BACKSPACE:
       board.rewind(1);
+      noMove = false;
       break;
     default:
       switch (key) {
@@ -513,7 +514,6 @@ function setup() {
   );
   sprites = fetchSprites(board);
   currentRobot = robots[1];
-  noMove = true;
   startGame();
 }
 function setupTimer() {
@@ -570,6 +570,9 @@ function setupAddPlayer() {
   button.onclick = () => {
     const id = playerList[playerList.length - 1].id + 1;
     const newPlayer = new Player(`Player ${id}`, id);
+    if (playerList.length == 1) {
+      playerList[0].nameInput.focus(); //So the previous name input goes away (really only applies to P1)
+    }
     addPlayer(newPlayer);
   };
 }
@@ -646,7 +649,7 @@ function addPlayer(player) {
     player.nameInput.focus();
     player.nameInput.select();
   }
-  if (playerList.length > 17)
+  if (playerList.length > 11)
     //we have to stop somewhere
     document.getElementById("add-player-button").classList.add("hidden");
 }

@@ -391,6 +391,7 @@ function keyPressed() {
       break;
     case BACKSPACE:
       board.rewind(1);
+      noMove = false;
       break;
     default:
       switch (key) {
@@ -513,7 +514,6 @@ function setup() {
   );
   sprites = fetchSprites(board);
   currentRobot = robots[1];
-  noMove = true;
   startGame();
 }
 function setupTimer() {

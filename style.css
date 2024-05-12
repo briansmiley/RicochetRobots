@@ -65,6 +65,16 @@ main {
   margin: 0.2em;
   min-height: 22px;
 }
+.player-name {
+  padding: 2px;
+}
+.player-name:hover {
+  border: 2px solid #007bff;
+  border-radius: 3px;
+  background-color: #f0f9ff;
+  cursor: pointer;
+}
+
 .player-score {
   margin-left: 5px;
 }

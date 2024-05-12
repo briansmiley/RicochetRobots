@@ -189,7 +189,7 @@ class Board {
         if (moveCounter.count < turnBest || turnBest == 0) this.saveEndSpots();
       }
       hitTarget = true;
-      updateTurnBest(moveCounter.count + 1);
+      updateTurnBest(moveCounter.count);
       noMove = true;
     } else hitTarget = false;
   }
@@ -328,7 +328,7 @@ class Board {
 
   //returns true if a valid robot is sitting on the target sprite
   checkGoal() {
-    if (!currentToken) return false;
+    if (!currentToken || inMotion) return false;
     const onTarget = (robot) =>
       robot.x == currentToken.x && robot.y == currentToken.y;
     //If we are aiming for free square, check if ANY bot is touching

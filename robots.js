@@ -352,16 +352,20 @@ function fetchSprites(board) {
   return sprites;
 }
 
-function mousePressed() {
-  let x = floor(mouseX / squareSize);
-  let y = floor(mouseY / squareSize);
+function mouseClicked() {
+  let x = floor((mouseX - board.origX) / squareSize);
+  let y = floor((mouseY - board.origY) / squareSize);
   // console.log(`Clicked at ${int(mouseX)} ${int(mouseY)} which we take as ${x} ${y}`)
 
+  //Clicking a robot selects it
   robots.forEach((robot) => {
     if (robot.x == x && robot.y == y) {
       robot.select();
+      return;
     }
   });
+
+  //Clicking center of board restarts game or picks a new target
   if (x >= 7 && x <= 8 && y >= 7 && y <= 8) {
     if (gameOver) startGame();
     currentToken =
@@ -372,6 +376,13 @@ function mousePressed() {
     turnBest = 0;
     resetTurn();
     startTurn();
+    return;
+  }
+
+  //Clicking along the row/column of selected robot moves it
+  if (!inMotion) {
+    if (x == currentRobot.x) y > currentRobot.y ? moveDown() : moveUp();
+    if (y == currentRobot.y) x > currentRobot.x ? moveRight() : moveLeft();
   }
 }
 function keyPressed() {
@@ -379,16 +390,16 @@ function keyPressed() {
   if (inMotion) return;
   switch (keyCode) {
     case UP_ARROW:
-      currentRobot.vel = [0, -1];
+      moveUp();
       break;
     case DOWN_ARROW:
-      currentRobot.vel = [0, 1];
+      moveDown();
       break;
     case LEFT_ARROW:
-      currentRobot.vel = [-1, 0];
+      moveLeft();
       break;
     case RIGHT_ARROW:
-      currentRobot.vel = [1, 0];
+      moveRight();
       break;
     case BACKSPACE:
       board.rewind(1);
@@ -400,16 +411,16 @@ function keyPressed() {
           resetTurn();
           break;
         case "w":
-          currentRobot.vel = [0, -1];
+          moveUp();
           break;
         case "s":
-          currentRobot.vel = [0, 1];
+          moveDown();
           break;
         case "a":
-          currentRobot.vel = [-1, 0];
+          moveLeft();
           break;
         case "d":
-          currentRobot.vel = [1, 0];
+          moveRight();
           break;
         case "r":
         case "g":
@@ -771,4 +782,17 @@ class Timer {
     fill(this.remaining() == 0 ? "red" : 0);
     text(`${parseInt(this.remaining() / 1000)}`, 0, 0);
   });
+}
+
+function moveUp() {
+  currentRobot.vel = [0, -1];
+}
+function moveRight() {
+  currentRobot.vel = [1, 0];
+}
+function moveDown() {
+  currentRobot.vel = [0, 1];
+}
+function moveLeft() {
+  currentRobot.vel = [-1, 0];
 }

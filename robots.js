@@ -380,9 +380,8 @@ function mouseClicked() {
   }
 
   //Clicking along the row/column of selected robot moves it
-    if (x == currentRobot.x) y > currentRobot.y ? moveDown() : moveUp();
-    if (y == currentRobot.y) x > currentRobot.x ? moveRight() : moveLeft();
-  }
+  if (x == currentRobot.x) y > currentRobot.y ? moveDown() : moveUp();
+  if (y == currentRobot.y) x > currentRobot.x ? moveRight() : moveLeft();
 }
 function keyPressed() {
   if (document.activeElement.tagName == "INPUT") return; //ignore keyboard inputs if we are editing a player name

@@ -22,7 +22,8 @@ let collectedTokens = [];
 let moveCounter, hitTarget, turnBest;
 let playerList = [];
 let gameOver;
-let roboSounds, victorySound;
+let roboSounds = Array(4);
+let victorySound;
 let turnTimer;
 const noBloops = true; //stop robots from speaking
 
@@ -97,7 +98,7 @@ class Robot {
       board.history.push({
         colorName: this.colorName,
         x: this.lastStopX,
-        y: this.lastStopY,
+        y: this.lastStopY
       });
       this.lastStopX = this.x;
       this.lastStopY = this.y;
@@ -434,7 +435,7 @@ function placeBots() {
         [7, 7],
         [7, 8],
         [8, 7],
-        [8, 8],
+        [8, 8]
       ];
       collision =
         sprites.some((sprite) => sprite.x == spotX && sprite.y == spotY) ||
@@ -482,12 +483,12 @@ function getNextToken() {
 
 function preload() {
   click = loadSound("sound/click.mp3");
-  roboSounds = Array.from({ length: 4 }, (_, i) =>
-    loadSound(`./sound/interface/question_00${i + 1}.ogg`)
-  );
-  roboSounds.forEach((sound) => sound.setVolume(0.1));
+  // roboSounds = Array.from({ length: 4 }, (_, i) =>
+  //   loadSound(`./sound/interface/question_00${i + 1}.ogg`)
+  // );
+  // roboSounds.forEach((sound) => sound.setVolume(0.1));
   click.setVolume(0.5);
-  victorySound = loadSound("./sound/interface/confirmation_004.ogg");
+  victorySound = loadSound("./sound/interface/confirmation_004.mp3");
   victorySound.setVolume(0.2);
 }
 function setup() {
@@ -514,6 +515,7 @@ function setup() {
   );
   sprites = fetchSprites(board);
   currentRobot = robots[1];
+
   startGame();
 }
 function setupTimer() {

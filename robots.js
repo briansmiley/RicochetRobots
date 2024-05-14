@@ -355,7 +355,7 @@ function fetchSprites(board) {
 function mouseClicked() {
   let x = floor((mouseX - board.origX) / squareSize);
   let y = floor((mouseY - board.origY) / squareSize);
-  let selectedABot = false;
+  let didSomething = false;
   // console.log(`Clicked at ${int(mouseX)} ${int(mouseY)} which we take as ${x} ${y}`)
 
   //Clicking a robot selects it
@@ -363,8 +363,8 @@ function mouseClicked() {
     if (robot.x == x && robot.y == y) {
       robot.select();
 
-      console.log(`Selected ${currentRobot}`);
-      selectedABot = true;
+      // console.log(`Selected ${currentRobot.colorName}`);
+      didSomething = true;
     }
   });
   //Clicking center of board restarts game or picks a new target
@@ -378,10 +378,11 @@ function mouseClicked() {
     turnBest = 0;
     resetTurn();
     startTurn();
+    didSomething = true;
   }
 
-  //Clicking along the row/column of selected robot moves it
-  if (!inMotion && !selectedABot) {
+  //Clicking along the row/column of selected robot moves it; check that we aren't already moving a bot and also that some other condition didnt happen since I cant figure out how to return out of mouseClicked
+  if (!inMotion && !didSomething) {
     if (x == currentRobot.x) y > currentRobot.y ? moveDown() : moveUp();
     if (y == currentRobot.y) x > currentRobot.x ? moveRight() : moveLeft();
   }

@@ -378,7 +378,6 @@ function mouseClicked() {
     turnBest = 0;
     resetTurn();
     startTurn();
-    return;
   }
 
   //Clicking along the row/column of selected robot moves it

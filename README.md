@@ -16,7 +16,7 @@ Try out the latest version on [my site](https://briansmiley.github.io/p5/ricoche
 
 - Click or press `r` `g` `b` and `y` to select the red/green/blue/yellow robot
 
-- `w` `a` `s` `d` or `↑` `←` `↓` `→` to move
+- `w` `a` `s` `d` or `↑` `←` `↓` `→` or click on the same row/column in the desired direction to move
 
 - Robots move until they hit a wall or another robot
 

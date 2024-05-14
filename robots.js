@@ -355,16 +355,18 @@ function fetchSprites(board) {
 function mouseClicked() {
   let x = floor((mouseX - board.origX) / squareSize);
   let y = floor((mouseY - board.origY) / squareSize);
+  let selectedABot = false;
   // console.log(`Clicked at ${int(mouseX)} ${int(mouseY)} which we take as ${x} ${y}`)
 
   //Clicking a robot selects it
   robots.forEach((robot) => {
     if (robot.x == x && robot.y == y) {
       robot.select();
-      return;
+
+      console.log(`Selected ${currentRobot}`);
+      selectedABot = true;
     }
   });
-
   //Clicking center of board restarts game or picks a new target
   if (x >= 7 && x <= 8 && y >= 7 && y <= 8) {
     if (gameOver) startGame();
@@ -376,11 +378,10 @@ function mouseClicked() {
     turnBest = 0;
     resetTurn();
     startTurn();
-    return;
   }
 
   //Clicking along the row/column of selected robot moves it
-  if (!inMotion) {
+  if (!inMotion && !selectedABot) {
     if (x == currentRobot.x) y > currentRobot.y ? moveDown() : moveUp();
     if (y == currentRobot.y) x > currentRobot.x ? moveRight() : moveLeft();
   }

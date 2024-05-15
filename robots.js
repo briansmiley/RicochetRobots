@@ -356,7 +356,7 @@ function mouseClicked() {
   let x = floor((mouseX - board.origX) / squareSize);
   let y = floor((mouseY - board.origY) / squareSize);
   // console.log(`Clicked at ${int(mouseX)} ${int(mouseY)} which we take as ${x} ${y}`)
-
+  if (x < 0 || x > board.w || y < 0 || y > board.h) return; // ignore clicks off canvas
   //Clicking a robot selects it
   for (const robot of robots) {
     if (robot.x == x && robot.y == y) {

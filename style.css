@@ -45,6 +45,9 @@ main {
   align-items: flex-start;
   width: 22px;
 }
+#left-buttons > * {
+  margin-bottom: 0.5em;
+}
 #overlay {
   display: none;
   justify-content: center;

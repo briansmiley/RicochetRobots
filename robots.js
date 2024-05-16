@@ -25,6 +25,8 @@ let gameOver;
 let roboSounds = Array(4);
 let victorySound;
 let turnTimer;
+let timerButton, undoButton, resetButton;
+
 const noBloops = true; //stop robots from speaking
 
 class Counter {
@@ -199,7 +201,7 @@ class Board {
       (robot) => (this.endSpots[robot.colorName] = [robot.x, robot.y])
     );
   }
-  rewind(n) {
+  rewind(n = 1) {
     if (this.history.length == 0) {
       robots.forEach((robot) => robot.place(robot.lastX, robot.lastY));
       return;
@@ -356,7 +358,7 @@ function mouseClicked() {
   let x = floor((mouseX - board.origX) / squareSize);
   let y = floor((mouseY - board.origY) / squareSize);
   // console.log(`Clicked at ${int(mouseX)} ${int(mouseY)} which we take as ${x} ${y}`)
-  if (x < 0 || x > board.w || y < 0 || y > board.h) return; // ignore clicks off canvas
+  if (x < 0 || x > board.w - 1 || y < 0 || y > board.h - 1) return; // ignore clicks off canvas
   //Clicking a robot selects it
   for (const robot of robots) {
     if (robot.x == x && robot.y == y) {
@@ -507,6 +509,7 @@ function setup() {
   background(255);
   frameRate(60);
   setupTimer();
+  setupButtons();
   window.addEventListener("keydown", (event) => {
     if (event.key == " ") event.preventDefault();
   });
@@ -527,9 +530,16 @@ function setup() {
 
   startGame();
 }
+function setupButtons() {
+  undoButton = document.getElementById("undo-button");
+  undoButton.onclick = () => board.rewind();
+  resetButton = document.getElementById("reset-button");
+  resetButton.onclick = () => resetTurn();
+}
 function setupTimer() {
   turnTimer = new Timer();
-  let timerButton = document.getElementById("timer-button");
+
+  timerButton = document.getElementById("timer-button");
   timerButton.addEventListener("click", () => {
     if (!turnTimer.running) {
       turnTimer.start();

@@ -44,7 +44,7 @@ class Counter {
   }
   render = pushWrap((x = width / 2, y = width + squareSize) => {
     fill(0);
-    textSize(24);
+    textSize((24 / 505) * width);
     textAlign(CENTER, BOTTOM);
     text(`Moves: ${this.count > 0 ? this.count : `-`}`, x, y);
   });
@@ -246,7 +246,7 @@ class Board {
   });
   renderCounter = () => moveCounter.render();
   renderTurnBest = pushWrap(() => {
-    textSize(16);
+    textSize((16 / 500) * width);
     textAlign(RIGHT, BOTTOM);
     fill("green");
     text(`Best: ${turnBest > 0 ? turnBest : `-`}`, width, (width * 17) / 16);
@@ -309,7 +309,7 @@ class Board {
       circle(0, 0, squareSize * 1.8);
       fill(255);
       textAlign(CENTER, CENTER);
-      textSize(36);
+      textSize((36 / 500) * width);
       text(totalMoves(sprites), 0, 0);
       pop();
     }
@@ -714,7 +714,7 @@ function updateTurnBest(n) {
 }
 
 drawTokenLine = pushWrap((tokens) => {
-  textSize(16);
+  textSize((16 / 500) * width);
   fill(0);
   textAlign(CENTER, BOTTOM);
   tokens.forEach((token, i) => {
@@ -786,7 +786,7 @@ class Timer {
     this.button.innerText = "Start";
   }
   render = pushWrap(() => {
-    textSize(32);
+    textSize((24 / 500) * width);
     fill(this.remaining() == 0 ? "red" : 0);
     text(`${parseInt(this.remaining() / 1000)}`, 0, 0);
   });

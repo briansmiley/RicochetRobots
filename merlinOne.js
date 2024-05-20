@@ -638,7 +638,7 @@ class Board {
       collectible = true;
       hitTarget = true;
       updateTurnBest(moveCounter.count);
-      // noMove = true;
+      noMove = true;
     } else hitTarget = false;
   }
   saveEndSpots() {
@@ -647,6 +647,7 @@ class Board {
     );
   }
   rewind(n = 1) {
+    noMove = false;
     if (this.history.length == 0) {
       robots.forEach((robot) => robot.place(robot.lastX, robot.lastY));
       return;
@@ -937,6 +938,7 @@ function getNextToken() {
 //   victorySound.setVolume(0.2);
 // }
 function setup() {
+  blendMode(REPLACE);
   noSmooth();
   let w = min(windowWidth, (windowHeight - 100) / 1.2);
   //   let canvas = createCanvas(w, w * 1.17);

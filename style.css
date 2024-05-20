@@ -96,6 +96,9 @@ button {
   display: inline-block;
   font-size: 16px;
 }
+button:hover {
+  background-color: #01517f;
+}
 .hidden {
   display: none;
 }

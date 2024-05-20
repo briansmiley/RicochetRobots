@@ -721,7 +721,7 @@ drawTokenLine = pushWrap((tokens) => {
     if (i == 8) translate(-8 * 0.75 * squareSize, squareSize * 1.2);
     translate(0.75 * squareSize, 0);
     token.drawSmall();
-    text(token.collectedIn, 0, 0.75 * squareSize);
+    text(token.collectedIn, 0, 0.85 * squareSize);
   });
   translate(0.75 * squareSize, 0);
   textAlign(CENTER, CENTER);

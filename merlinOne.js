@@ -1,3 +1,78 @@
+var robotSelector = merlinDropdown(["Red", "Green", "Cyan", "Yellow"], "Red");
+merlinOnChange("robotSelector", selectRobot);
+function selectRobot() {
+  if (!robots.length) {
+    console.log("!robots, onChange should return");
+    return;
+  }
+  console.log(`Selecting ${robotSelector} robot`);
+  robots
+    .find((robot) => robot.colorName == robotSelector.toLowerCase())
+    .select();
+}
+var Bedrooms = merlinButton(moveLeft, "", "ArrowLeft");
+var Wall = merlinButton(moveRight, "", "ArrowRight");
+var Screen = merlinButton(moveUp, "", "ArrowUp");
+var Stairs = merlinButton(moveDown, "", "ArrowDown");
+
+var Red = merlinButton(selectRed, "", "r");
+var Green = merlinButton(selectGreen, "", "g");
+var Blue = merlinButton(selectCyan, "", "b");
+var Yellow = merlinButton(selectYellow, "", "y");
+
+var Reset = merlinButton(resetTurn, "", " ");
+var Collect = merlinButton(collectSkyToken, "", "c");
+
+// Undo command will need porting of history and rewind functionality
+var Undo = merlinButton(buttonRewind, "", "Backspace");
+function buttonRewind() {
+  board.rewind();
+}
+function moveUp() {
+  if (inMotion) return;
+  currentRobot.vel = [0, -1];
+}
+function moveRight() {
+  if (inMotion) return;
+  currentRobot.vel = [1, 0];
+}
+function moveDown() {
+  if (inMotion) return;
+  currentRobot.vel = [0, 1];
+}
+function moveLeft() {
+  if (inMotion) return;
+  currentRobot.vel = [-1, 0];
+}
+function collectSkyToken() {
+  if (!collectible) return;
+  currentToken.collected = true;
+  collectedTokens.push(currentToken);
+  currentToken = getNextToken();
+  startTurn();
+}
+function selectRed() {
+  currentRobot = robots.find((robot) => robot.colorName == "red");
+}
+function selectGreen() {
+  currentRobot = robots.find((robot) => robot.colorName == "green");
+}
+function selectCyan() {
+  currentRobot = robots.find((robot) => robot.colorName == "cyan");
+}
+function selectYellow() {
+  currentRobot = robots.find((robot) => robot.colorName == "yellow");
+}
+let zoomStart = 0;
+// function spiralBoard() {
+
+//   translate(board.w * squareSize/2, board.h * squareSize/2)
+//   zoomStart = zoomStart | frameCount;
+//   let t = frameCount - zoomStart;
+//   rotate(t * .005);
+//   // scale(.99**(frameCount - t))
+
+// }
 function pushWrap(fn) {
   return (...args) => {
     push();
@@ -6,6 +81,12 @@ function pushWrap(fn) {
     return res;
   };
 }
+
+const colorToBrightness = pushWrap((oldColor, newBrightness) => {
+  colorMode(HSB);
+  let newColor = color(oldColor);
+  return color([hue(newColor), saturation(newColor), newBrightness]);
+});
 class Shape {
   constructor(x, y, colr = null) {
     this.color = color(colr);
@@ -32,9 +113,26 @@ class Shape {
   renderBoard() {
     this.drawMed();
   }
-  renderMerlin = pushWrap(() => {
-    stroke(this.color);
-    point(0, 0);
+  renderMerlin = pushWrap((x = 0, y = 0, flash = true, pulse = false) => {
+    colorMode(HSB);
+    let colr = this.color;
+    if (this.colorName == "white") {
+      flash = false;
+      colr = ["red", "green", "cyan", "yellow"][
+        parseInt((frameCount % 60) / 15)
+      ]; //flash between rgby every 1/4 second
+    }
+    //fade pulse
+    if (pulse) {
+      colr = colorToBrightness(
+        colr,
+        100 * (1 / 3) * (2 + cos((PI * ((frameCount % 360) - 180)) / 180))
+      );
+    }
+    stroke(colr);
+    if (parseInt((frameCount % 120) / 60) || !flash) {
+      point(x, y);
+    }
   });
 
   dim(alph) {
@@ -129,7 +227,7 @@ class Burst extends Shape {
       color(0, 119, 255, alph),
       color(0, 153, 192, alph),
       color(245, 126, 0, alph),
-      color(0, 0, 0, 100),
+      color(0, 0, 0, 100)
     ];
     colors.forEach((color) => {
       fill(color);
@@ -164,6 +262,9 @@ class Space {
   }
   renderWalls = pushWrap((size, wallThickness, colr) => {
     translate(this.x * size, this.y * size);
+    strokeWeight(1);
+    stroke(40);
+    point(size / 2, size / 2);
     strokeWeight(wallThickness);
     stroke(colr);
     if (this.northWall) {
@@ -267,13 +368,13 @@ function initBoard() {
             space.northWall,
             space.eastWall,
             space.southWall,
-            space.westWall,
+            space.westWall
           ];
           [space.northWall, space.eastWall, space.southWall, space.westWall] = [
             temp[3],
             temp[0],
             temp[1],
-            temp[2],
+            temp[2]
           ];
         }
       }
@@ -303,17 +404,17 @@ function initBoard() {
   board1[0][2][1].addWall("w").addWall("s").addSprite(Square, "red");
   board1[0][3][0].addWall("s");
   board1[0][4][6].addWall("n").addWall("w").addSprite(Circle, "yellow");
-  board1[0][6][2].addWall("n").addWall("e").addSprite(Triangle, "blue");
+  board1[0][6][2].addWall("n").addWall("e").addSprite(Triangle, "cyan");
 
   board1[1][0][4].addWall("e");
   board1[1][1][2].addWall("w").addWall("n").addSprite(Circle, "yellow");
-  board1[1][3][6].addWall("w").addWall("s").addSprite(Triangle, "blue");
+  board1[1][3][6].addWall("w").addWall("s").addSprite(Triangle, "cyan");
   board1[1][4][0].addWall("s");
   board1[1][5][4].addWall("n").addWall("e").addSprite(Square, "red");
   board1[1][6][1].addWall("n").addWall("e").addSprite(Star, "green");
 
   board2[0][0][3].addWall("e");
-  board2[0][2][5].addWall("e").addWall("s").addSprite(Star, "blue");
+  board2[0][2][5].addWall("e").addWall("s").addSprite(Star, "cyan");
   board2[0][4][0].addWall("s");
   board2[0][4][2].addWall("e").addWall("n").addSprite(Circle, "green");
   board2[0][5][7].addWall("w").addWall("s").addSprite(Triangle, "red");
@@ -322,7 +423,7 @@ function initBoard() {
   board2[1][0][3].addWall("e");
   board2[1][1][1].addWall("w").addWall("s").addSprite(Triangle, "red");
   board2[1][2][6].addWall("e").addWall("n").addSprite(Circle, "green");
-  board2[1][4][2].addWall("s").addWall("e").addSprite(Star, "blue");
+  board2[1][4][2].addWall("s").addWall("e").addSprite(Star, "cyan");
   board2[1][5][0].addWall("s");
   board2[1][5][7].addWall("n").addWall("w").addSprite(Square, "yellow");
 
@@ -330,7 +431,7 @@ function initBoard() {
   board3[0][1][6].addWall("e").addWall("s").addSprite(Star, "yellow");
   board3[0][2][1].addWall("w").addWall("n").addSprite(Triangle, "green");
   board3[0][5][0].addWall("s");
-  board3[0][5][6].addWall("n").addWall("e").addSprite(Square, "blue");
+  board3[0][5][6].addWall("n").addWall("e").addSprite(Square, "cyan");
   board3[0][6][3].addWall("w").addWall("s").addSprite(Circle, "red");
 
   board3[1][0][1].addWall("e");
@@ -338,18 +439,18 @@ function initBoard() {
   board3[1][2][1].addWall("n").addWall("e").addSprite(Triangle, "green");
   board3[1][3][6].addWall("s").addWall("e").addSprite(Star, "yellow");
   board3[1][5][0].addWall("s");
-  board3[1][6][3].addWall("w").addWall("s").addSprite(Square, "blue");
+  board3[1][6][3].addWall("w").addWall("s").addSprite(Square, "cyan");
 
   board4[0][0][5].addWall("e");
   board4[0][1][2].addWall("e").addWall("s").addSprite(Star, "red");
   board4[0][3][1].addWall("s").addWall("w").addSprite(Square, "green");
   board4[0][4][0].addWall("s");
   board4[0][4][6].addWall("w").addWall("n").addSprite(Triangle, "yellow");
-  board4[0][6][5].addWall("n").addWall("e").addSprite(Circle, "blue");
+  board4[0][6][5].addWall("n").addWall("e").addSprite(Circle, "cyan");
   board4[0][7][3].addWall("s").addWall("e").addSprite(Burst, "white");
 
   board4[1][0][3].addWall("e");
-  board4[1][1][6].addWall("w").addWall("s").addSprite(Circle, "blue");
+  board4[1][1][6].addWall("w").addWall("s").addSprite(Circle, "cyan");
   board4[1][3][1].addWall("e").addWall("n").addSprite(Triangle, "yellow");
   board4[1][4][5].addWall("w").addWall("n").addSprite(Square, "green");
   board4[1][5][2].addWall("s").addWall("e").addSprite(Star, "red");
@@ -381,6 +482,7 @@ let currentToken, tokens;
 let collectedTokens = [];
 let moveCounter, hitTarget, turnBest;
 let playerList = [];
+let collectible = false;
 let gameOver;
 let roboSounds, victorySound;
 let turnTimer;
@@ -404,6 +506,15 @@ class Counter {
     textSize(24);
     textAlign(CENTER, BOTTOM);
     text(`Moves: ${this.count > 0 ? this.count : `-`}`, x, y);
+  });
+  renderMerlin = pushWrap((x = (board.w / 2) * squareSize, y = 0) => {
+    translate(x, y);
+    fill(150);
+    stroke(150);
+    // rect(0,0,5)
+    textAlign(CENTER, BOTTOM);
+    textSize(10);
+    text(this.count, 0, 0);
   });
 }
 class Robot {
@@ -452,8 +563,15 @@ class Robot {
   stop() {
     this.vel = [0, 0];
     if (inMotion) {
+      board.history.push({
+        colorName: this.colorName,
+        x: this.lastStopX,
+        y: this.lastStopY
+      });
+      this.lastStopX = this.x;
+      this.lastStopY = this.y;
       // click.play();
-      //   moveCounter.increment();
+      moveCounter.increment();
     }
     inMotion = false;
   }
@@ -519,12 +637,14 @@ class Robot {
 class Board {
   constructor(spacesArray) {
     // this.origX = 0;
-    this.origY = 0;
+    this.origY = 19.5;
     this.w = spacesArray[0].length;
     this.h = spacesArray.length;
     this.wallThickness = wallThickness;
     this.squareSize = squareSize;
     this.spaces = spacesArray;
+    this.history = [];
+    this.endSpots = {};
     this.origX = width / 2 - (this.squareSize * this.w) / 2;
   }
   locate(x, y) {
@@ -532,26 +652,53 @@ class Board {
     this.origY = y;
   }
   update() {
-    currentRobot.move();
+    if (frameCount % 4 == 0) currentRobot.move();
     if (this.checkGoal()) {
-      // if (!hitTarget) victorySound.play();
+      if (!hitTarget) {
+        if (moveCounter.count < turnBest || turnBest == 0) this.saveEndSpots();
+      }
+      collectible = true;
       hitTarget = true;
-      //   updateTurnBest(moveCounter.count + 1);
-      noMove = true;
+      // noMove = true;
     } else hitTarget = false;
+  }
+  saveEndSpots() {
+    robots.forEach(
+      (robot) => (this.endSpots[robot.colorName] = [robot.x, robot.y])
+    );
+  }
+  rewind(n = 1) {
+    if (this.history.length == 0) {
+      robots.forEach((robot) => robot.place(robot.lastX, robot.lastY));
+      return;
+    }
+    for (let i = 0; i < n; i++) {
+      let step = this.history.pop();
+      let rob = robots.find((robot) => robot.colorName == step.colorName);
+      rob.place(step.x, step.y);
+      rob.lastStopX = step.x;
+      rob.lastStopY = step.y;
+      moveCounter.increment(-1);
+    }
+  }
+  resetHistory() {
+    this.history = [];
+    robots.forEach(
+      (robot) => ([robot.lastStopX, robot.lastStopY] = [robot.x, robot.y])
+    );
   }
 
   show = pushWrap(() => {
     translate(this.origX, this.origY);
-    this.renderGrid();
+    // this.renderGrid();
     this.renderWalls();
     // this.renderCurrentToken();
     this.renderSprites();
     // this.renderPlaceholders();
     this.renderBots();
-    // this.renderCounter();
+    this.renderCounter();
     // this.renderTurnBest();
-    // this.renderCollected();
+    this.renderCollected();
     // this.renderTimer();
     // updatePlayers();
   });
@@ -561,10 +708,11 @@ class Board {
     turnTimer.render();
   });
   renderCollected = pushWrap(() => {
-    translate(0, width + squareSize / 2);
-    drawTokenLine(collectedTokens);
+    translate(squareSize * board.w, squareSize * board.h + 4);
+    // drawTokenLine(collectedTokens);
+    drawTokenLineMerlin(collectedTokens);
   });
-  renderCounter = () => moveCounter.render();
+  renderCounter = () => moveCounter.renderMerlin();
   renderTurnBest = pushWrap(() => {
     textSize(16);
     textAlign(RIGHT, BOTTOM);
@@ -573,7 +721,7 @@ class Board {
   });
   renderGrid = pushWrap(() => {
     //Draw the boxes
-    stroke(60);
+    stroke(150);
     fill(0);
     for (let i = 0; i < this.h; i++) {
       for (let j = 0; j < this.w; j++) {
@@ -600,7 +748,7 @@ class Board {
   renderWalls() {
     this.spaces.forEach((row) =>
       row.forEach((space) =>
-        space.renderWalls(this.squareSize, this.wallThickness, 200)
+        space.renderWalls(this.squareSize, this.wallThickness, [125, 50, 50])
       )
     );
   }
@@ -707,33 +855,33 @@ function keyPressed() {
   if (inMotion) return;
   switch (keyCode) {
     case UP_ARROW:
-      currentRobot.vel = [0, -1];
+      moveUp();
       break;
     case DOWN_ARROW:
-      currentRobot.vel = [0, 1];
+      moveDown();
       break;
     case LEFT_ARROW:
-      currentRobot.vel = [-1, 0];
+      moveLeft();
       break;
     case RIGHT_ARROW:
-      currentRobot.vel = [1, 0];
+      moveRight();
       break;
     default:
       switch (key) {
-        case "r":
+        case " ":
           resetTurn();
           break;
         case "w":
-          currentRobot.vel = [0, -1];
+          moveUp();
           break;
         case "s":
-          currentRobot.vel = [0, 1];
+          moveDown();
           break;
         case "a":
-          currentRobot.vel = [-1, 0];
+          moveRight();
           break;
         case "d":
-          currentRobot.vel = [1, 0];
+          moveLeft();
           break;
       }
   }
@@ -753,7 +901,7 @@ function placeBots() {
         [7, 7],
         [7, 8],
         [8, 7],
-        [8, 8],
+        [8, 8]
       ];
       collision =
         sprites.some((sprite) => sprite.x == spotX && sprite.y == spotY) ||
@@ -773,20 +921,20 @@ function placeBots() {
 // spriteData = [
 //   {x: 1, y: 2, ShapeClass: Triangle, color: 'green'},
 //   {x: 6, y: 1, ShapeClass: Square, color: 'yellow'},
-//   {x: 6, y: 5, ShapeClass: Square, color: 'blue'},
+//   {x: 6, y: 5, ShapeClass: Square, color: 'cyan'},
 //   {x: 3, y: 6, ShapeClass: Circle, color: 'red'},
 //   {x: 7, y: 12, ShapeClass: Burst, color: 'white'},
 //   {x: 9, y: 1, ShapeClass: Square, color: 'green'},
 //   {x: 4, y: 9, ShapeClass: Triangle, color: 'yellow'},
-//   {x: 6, y: 10, ShapeClass: Circle, color: 'blue'},
+//   {x: 6, y: 10, ShapeClass: Circle, color: 'cyan'},
 //   {x: 8, y: 10, ShapeClass: Circle, color: 'yellow'},
 //   {x: 10, y: 4, ShapeClass: Square, color: 'red'},
 //   {x: 14, y: 2, ShapeClass: Star, color: 'yellow'},
-//   {x: 12, y: 6, ShapeClass: Triangle, color: 'blue'},
+//   {x: 12, y: 6, ShapeClass: Triangle, color: 'cyan'},
 //   {x: 3, y: 14, ShapeClass: Star, color: 'green'},
 //   {x: 1, y: 13, ShapeClass: Star, color: 'red'},
 //   {x: 9, y: 13, ShapeClass: Circle, color: 'green'},
-//   {x: 13, y: 11, ShapeClass: Star, color: 'blue'},
+//   {x: 13, y: 11, ShapeClass: Star, color: 'cyan'},
 //   {x: 14, y: 14, ShapeClass: Triangle, color: 'red'},
 // ]
 
@@ -810,25 +958,26 @@ function getNextToken() {
 //   victorySound.setVolume(0.2);
 // }
 function setup() {
+  noSmooth();
   let w = min(windowWidth, (windowHeight - 100) / 1.2);
   //   let canvas = createCanvas(w, w * 1.17);
-  let canvas = createCanvas(44, 66);
+  let canvas = createCanvas(43, 66);
   //   canvas.parent("canvas-here");
   background(0);
   //   frameRate(60);
   //   setupTimer();
-  //   moveCounter = new Counter();
+  moveCounter = new Counter();
   //   squareSize = width / 16;
   //   wallThickness = squareSize / 9;
   squareSize = 2;
   wallThickness = 1;
   board = new Board(initBoard());
-  ["red", "yellow", "green", "blue"].forEach((color, i) =>
+  ["red", "yellow", "green", "cyan"].forEach((color, i) =>
     robots.push(new Robot(-1, -1, color))
   );
   sprites = fetchSprites(board);
-  currentRobot = robots[1];
-  noMove = true;
+  currentRobot = robots[0];
+  noMove = false;
   startGame();
 }
 function setupTimer() {
@@ -846,6 +995,7 @@ function setupTimer() {
   });
 }
 function draw() {
+  clear();
   background(0);
   // if (frameCount % 15 == 0)console.log(inMotion);
   if (frameCount == 2 && playerList.length == 0) {
@@ -853,7 +1003,11 @@ function draw() {
     secondFrame = true;
   }
   board.update();
+  push();
+  // spiralBoard();
   board.show();
+  pop();
+  // currentToken = sprites.find( (sprite) => sprite.colorName == "white");
 }
 class Player {
   constructor(name, id) {
@@ -944,12 +1098,21 @@ function initializePlayers() {
 }
 
 function startTurn() {
+  if (Object.keys(board.endSpots).length) {
+    for (robot of robots) {
+      robot.x = board.endSpots[robot.colorName][0];
+      robot.y = board.endSpots[robot.colorName][1];
+    }
+  }
   robots.forEach((robot) => {
     robot.lastX = robot.x;
     robot.lastY = robot.y;
   });
+  collectible = false;
+  board.resetHistory();
+  board.saveEndSpots();
   //   turnTimer.reset();
-  //   moveCounter.reset();
+  moveCounter.reset();
   turnBest = 0;
   noMove = false;
 }
@@ -958,7 +1121,9 @@ function resetTurn() {
     robot.x = robot.lastX;
     robot.y = robot.lastY;
   });
-  //   moveCounter.reset();
+  currentRobot.vel = [0, 0];
+  board.resetHistory();
+  moveCounter.reset();
   noMove = false;
 }
 
@@ -981,6 +1146,12 @@ drawTokenLine = pushWrap((tokens) => {
   textAlign(CENTER, CENTER);
   if (tokens.length) text(totalMoves(tokens), 0, 0);
 });
+
+function drawTokenLineMerlin(tokens) {
+  tokens.forEach((token, i) => {
+    token.renderMerlin(-2 * (i % 8), 2 * parseInt(i / 8), false, true);
+  });
+}
 function totalMoves(tokens) {
   return tokens.reduce((s, t) => s + t.collectedIn, 0);
 }
@@ -991,10 +1162,10 @@ function setAlpha(colr, alph) {
 function startGame() {
   gameOver = false;
   noMove = false;
-  //   moveCounter.reset();
+  moveCounter.reset();
   sprites.forEach((sprite) => sprite.reset());
   hitTarget = false;
-  currentRobot = robots[1];
+  currentRobot = robots[0];
   currentToken = getNextToken();
   //   playerList.forEach((player) => player.reset());
   placeBots();

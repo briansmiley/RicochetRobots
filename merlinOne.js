@@ -52,16 +52,16 @@ function collectSkyToken() {
   startTurn();
 }
 function selectRed() {
-  currentRobot = robots.find((robot) => robot.colorName == "red");
+  robots.find((robot) => robot.colorName == "red").select();
 }
 function selectGreen() {
-  currentRobot = robots.find((robot) => robot.colorName == "green");
+  robots.find((robot) => robot.colorName == "green").select();
 }
 function selectCyan() {
-  currentRobot = robots.find((robot) => robot.colorName == "cyan");
+  robots.find((robot) => robot.colorName == "cyan").select();
 }
 function selectYellow() {
-  currentRobot = robots.find((robot) => robot.colorName == "yellow");
+  robots.find((robot) => robot.colorName == "yellow").select();
 }
 let zoomStart = 0;
 // function spiralBoard() {
@@ -534,6 +534,7 @@ class Robot {
     // this.sound.play();
   }
   select() {
+    if (inMotion) return;
     this.speak();
     this.selected = true;
     currentRobot = this;
@@ -571,7 +572,6 @@ class Robot {
       this.lastStopX = this.x;
       this.lastStopY = this.y;
       // click.play();
-      moveCounter.increment();
     }
     inMotion = false;
   }
@@ -580,57 +580,35 @@ class Robot {
     let currentSquare = board.spaces[this.y][this.x];
     let nextX = this.x + this.vel[0];
     let nextY = this.y + this.vel[1];
-    //Stop if there is a robot in the cell we want to move to
-    for (let i = 0; i < robots.length; i++) {
-      if (robots[i].x == nextX && robots[i].y == nextY) {
-        this.stop();
-        return;
-      }
-    }
 
-    //If moving right
-    if (this.vel[0] == 1) {
-      //Stop at edge of board or if there's a wall to your east
-      if (this.x == board.spaces[this.y].length - 1 || currentSquare.eastWall) {
-        this.stop();
-        return;
-      } else {
-        this.x++;
-        inMotion = true;
-      }
+    //block conditions
+    const blockedUp = this.y == 0 || currentSquare.northWall;
+    const blockedRight =
+      this.x == board.spaces[this.y].length - 1 || currentSquare.eastWall;
+    const blockedDown =
+      this.y == board.spaceslength - 1 || currentSquare.southWall;
+    const blockedLeft = this.x == 0 || currentSquare.westWall;
+    const blockedByRobot = robots.some(
+      (robot) => robot.x == nextX && robot.y == nextY
+    );
+    //stop if we can't move
+    if (
+      blockedByRobot ||
+      (this.vel[1] == -1 && blockedUp) ||
+      (this.vel[0] == 1 && blockedRight) ||
+      (this.vel[1] == 1 && blockedDown) ||
+      (this.vel[0] == -1 && blockedLeft)
+    ) {
+      this.stop();
+      return;
     }
-    //If moving left
-    if (this.vel[0] == -1) {
-      //Stop if at left edge or there's a western wall
-      if (this.x == 0 || currentSquare.westWall) {
-        this.stop();
-        return;
-      } else {
-        this.x--;
-        inMotion = true;
-      }
-    }
-    //If moving down
-    if (this.vel[1] == 1) {
-      //Stop if on last row or wall below
-      if (this.y == board.spaceslength - 1 || currentSquare.southWall) {
-        this.stop();
-        return;
-      } else {
-        this.y++;
-        inMotion = true;
-      }
-    }
-    //If moving up
-    if (this.vel[1] == -1) {
-      //Stop if at top
-      if (this.y == 0 || currentSquare.northWall) {
-        this.stop();
-        return;
-      } else {
-        this.y--;
-        inMotion = true;
-      }
+    //move if we can
+    else {
+      //if moving from stopped, increment move counter
+      if (!inMotion) moveCounter.increment(1);
+      this.x += this.vel[0];
+      this.y += this.vel[1];
+      inMotion = true;
     }
   }
 }
@@ -659,6 +637,7 @@ class Board {
       }
       collectible = true;
       hitTarget = true;
+      updateTurnBest(moveCounter.count);
       // noMove = true;
     } else hitTarget = false;
   }
@@ -976,7 +955,6 @@ function setup() {
     robots.push(new Robot(-1, -1, color))
   );
   sprites = fetchSprites(board);
-  currentRobot = robots[0];
   noMove = false;
   startGame();
 }
@@ -1120,8 +1098,8 @@ function resetTurn() {
   robots.forEach((robot) => {
     robot.x = robot.lastX;
     robot.y = robot.lastY;
+    robot.vel = [0, 0];
   });
-  currentRobot.vel = [0, 0];
   board.resetHistory();
   moveCounter.reset();
   noMove = false;
@@ -1165,7 +1143,7 @@ function startGame() {
   moveCounter.reset();
   sprites.forEach((sprite) => sprite.reset());
   hitTarget = false;
-  currentRobot = robots[0];
+  robots[0].select();
   currentToken = getNextToken();
   //   playerList.forEach((player) => player.reset());
   placeBots();

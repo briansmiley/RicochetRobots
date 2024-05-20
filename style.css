@@ -85,6 +85,17 @@ main {
   font-size: 12pt;
   width: 5em;
 }
+button {
+  background-color: #046daa; /* Blue */
+  border: none;
+  border-radius: 1em;
+  color: white;
+  padding: 8px 12px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+}
 .hidden {
   display: none;
 }

@@ -400,6 +400,10 @@ function keyPressed() {
         case "d":
           moveRight();
           break;
+        case "z":
+          board.rewind(1);
+          noMove = false;
+          break;
         case "r":
         case "g":
         case "b":

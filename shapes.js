@@ -2,6 +2,7 @@ class Shape {
   constructor(x, y, colr = null) {
     this.color = color(colr);
     this.colorName = colr;
+    this.stroke = 0;
     this.x = x;
     this.y = y;
     this.collected = false;
@@ -26,6 +27,7 @@ class Shape {
   }
   dim(alph) {
     this.color = setAlpha(this.color, alph);
+    this.stroke = map(alph, 0, 100, 255, 0);
   }
   undim() {
     this.dim(255);
@@ -42,6 +44,7 @@ class Triangle extends Shape {
   }
   draw = pushWrap((size) => {
     fill(this.color);
+    stroke(this.stroke);
     triangle(
       0,
       -size / 2,
@@ -58,6 +61,7 @@ class Square extends Shape {
   }
   draw = pushWrap((size) => {
     fill(this.color);
+    stroke(this.stroke);
     rect(-size / 2, -size / 2, size, size);
   });
 }
@@ -67,6 +71,7 @@ class Circle extends Shape {
   }
   draw = pushWrap((size) => {
     fill(this.color);
+    stroke(this.stroke);
     circle(0, 0, size);
   });
 }
@@ -77,6 +82,7 @@ class Star extends Shape {
   }
   draw = pushWrap((size) => {
     fill(this.color);
+    stroke(this.stroke);
     rotate(-PI / 2);
     beginShape();
     let x, y;
@@ -99,7 +105,7 @@ class Block extends Shape {
   }
   draw = pushWrap((size) => {
     fill(this.color);
-    noStroke();
+    stroke(this.stroke);
     rect(-size / 2, -size / 2, size);
   });
 }
@@ -120,6 +126,7 @@ class Burst extends Shape {
     ];
     colors.forEach((color) => {
       fill(color);
+      stroke(this.stroke);
       ellipse(0, 0, size, size / 4);
       rotate(PI / 6);
     });

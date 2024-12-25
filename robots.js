@@ -267,14 +267,19 @@ class Board {
           this.squareSize * (0.5 + currentSprite.x),
           this.squareSize * (0.5 + currentSprite.y)
         );
-        //Dim sprite if a robot is on top of it
-        robots.forEach((robot) => {
-          if (currentSprite.x == robot.x && currentSprite.y == robot.y)
-            currentSprite.dim(75);
-        });
+        
+        // Dim sprite if:
+        // 1. A robot is on top of it, OR
+        // 2. There is a current token and this sprite doesn't match it
+        if (
+          robots.some((robot) => currentSprite.x == robot.x && currentSprite.y == robot.y) ||
+          (currentToken && currentSprite !== currentToken)
+        ) {
+          currentSprite.dim(25);
+        }
+        
         currentSprite.renderBoard();
         currentSprite.undim();
-        // currentSprite.undim();
       })
     );
   }

@@ -230,6 +230,7 @@ class Board {
     text(`Best: ${turnBest > 0 ? turnBest : `-`}`, width, (width * 17) / 16);
   });
   renderGrid = pushWrap(() => {
+    stroke(200)
     //Draw the boxes
     for (let i = 0; i < this.h; i++) {
       for (let j = 0; j < this.w; j++) {
@@ -507,7 +508,7 @@ function setup() {
 
   moveCounter = new Counter();
   squareSize = width / 16;
-  wallThickness = squareSize / 9;
+  wallThickness = squareSize / 7;
   board = new Board(initBoard());
   ["red", "yellow", "green", "blue"].forEach((color, i) =>
     robots.push(new Robot(-1, -1, color, roboSounds[i]))

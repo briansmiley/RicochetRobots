@@ -48,6 +48,11 @@ main {
 #left-buttons > * {
   margin-bottom: 0.5em;
 }
+#canvas-here {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 #overlay {
   display: none;
   justify-content: center;

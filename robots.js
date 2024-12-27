@@ -273,7 +273,8 @@ class Board {
         // 1. A robot is on top of it, OR
         // 2. There is a current token and this sprite doesn't match it
         if (
-          robots.some((robot) => currentSprite.x == robot.x && currentSprite.y == robot.y) ||
+          robots.some((robot) => currentSprite.x == robot.x && currentSprite.y == robot.y) 
+          ||
           (currentToken && currentSprite !== currentToken)
         ) {
           currentSprite.dim(25);
@@ -491,11 +492,28 @@ function preload() {
   victorySound.setVolume(0.2);
 }
 function setup() {
-  let w = min(windowWidth, (windowHeight - 100) / 1.2);
+  // Calculate desired canvas size based on window dimensions
+  // Leave some margin for UI elements (buttons, players, etc)
+  const horizontalMargin = 40;
+  const verticalMargin = 100;
+  
+  const maxWidth = windowWidth - horizontalMargin;
+  const maxHeight = windowHeight - verticalMargin;
+  
+  // The game board is square but we need extra vertical space for the move counter
+  // Our target aspect ratio is 1.17 (height = width * 1.17)
+  const w = min(maxWidth, maxHeight / 1.17);
+  
   let canvas = createCanvas(w, w * 1.17);
   canvas.parent("canvas-here");
+  
   background(255);
   frameRate(60);
+  
+  // Scale game elements based on canvas width
+  squareSize = w / 16;  // 16x16 game board
+  wallThickness = squareSize / 7;
+  
   setupTimer();
   setupButtons();
   window.addEventListener("keydown", (event) => {
@@ -507,8 +525,6 @@ function setup() {
   setupAddPlayer();
 
   moveCounter = new Counter();
-  squareSize = width / 16;
-  wallThickness = squareSize / 7;
   board = new Board(initBoard());
   ["red", "yellow", "green", "blue"].forEach((color, i) =>
     robots.push(new Robot(-1, -1, color, roboSounds[i]))
@@ -790,4 +806,26 @@ function moveDown() {
 }
 function moveLeft() {
   currentRobot.vel = [-1, 0];
+}
+
+function windowResized() {
+  const horizontalMargin = 40;
+  const verticalMargin = 100;
+  
+  const maxWidth = windowWidth - horizontalMargin;
+  const maxHeight = windowHeight - verticalMargin;
+  
+  const w = min(maxWidth, maxHeight / 1.17);
+  
+  resizeCanvas(w, w * 1.17);
+  
+  // Rescale game elements
+  squareSize = w / 16;
+  wallThickness = squareSize / 7;
+  
+  // Update board dimensions
+  if (board) {
+    board.squareSize = squareSize;
+    board.wallThickness = wallThickness;
+  }
 }
